@@ -1,0 +1,31 @@
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# DATASETS - CRITICAL (Do NOT push 190,000 image files to GitHub)
+Train/
+Validation/
+Test/
+dataset/
+*.jpg
+*.jpeg
+*.png
+!models/*.png
+
+# Model Weights / Checkpoints (Large binaries > 40MB)
+# Uncomment the line below if you prefer sharing .pth via Google Drive/Git LFS
+# models/*.pth
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
