@@ -21,7 +21,7 @@ This project replicates, validates, and extends:
 
 ---
 
-## 📊 Current Experimental Benchmark (Phase 1, 2 & 3 - Batch Size = 8)
+## 📊 Current Experimental Benchmark (Phase 1, 2, 3 & 4 - Batch Size = 8)
 
 Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Real, 1,000 Fake)** under an 80:20 stratified split with exact base paper batch size ($B=8$):
 
@@ -30,8 +30,8 @@ Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Rea
 | **Base Paper Reported** *(Deepa et al.)* | *None* | ~10.91 M | **97.95%** | 0.9800 | 0.9800 | 0.9800 | — | Published |
 | **Model 1: Baseline Replicated ($B=8$)** | *None* | 10.91 M | **98.10%** | 0.9859 | **0.9760** | **0.9809** | 0.9944 | **Completed** |
 | **Model 2: EfficientNet-B3 + CBAM ($B=8$)** | Channel + Spatial ($7\times7$) | 11.20 M (+2.7%) | **97.90%** | 0.9858 | 0.9720 | 0.9789 | **0.9960** | **Completed** |
-| **Model 3: EfficientNet-B3 + Triplet Attention ($B=8$)** | Cross-Dimension Rotation | **10.91 M (+0.003%)** | **98.05%** | **0.9878** | 0.9730 | 0.9804 | 0.9958 | **Completed** |
-| **Model 4: Proposed Coord-EfficientNet-B3** | 1D Positional ($X, Y$) | ~10.93 M (+0.18%) | *Pending* | *Pending* | *Pending* | *Pending* | *Pending* | Upcoming |
+| **Model 3: EfficientNet-B3 + Triplet Attention ($B=8$)** | Cross-Dimension Rotation | **10.91 M (+0.003%)** | **98.05%** | 0.9878 | 0.9730 | 0.9804 | 0.9958 | **Completed** |
+| **Model 4: Proposed Coord-EfficientNet-B3 ($B=8$)** | 1D Positional ($X, Y$) | **11.12 M (+1.96%)** | **97.85%** | **0.9908** | 0.9660 | 0.9782 | 0.9958 | **Completed** |
 
 ---
 
@@ -42,11 +42,13 @@ Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Rea
 │   ├── model.py           # Baseline EfficientNet-B3 + 3-stage custom MLP head
 │   ├── model_cbam.py      # EfficientNet-B3 + CBAM attention module
 │   ├── model_triplet.py   # EfficientNet-B3 + Triplet Attention module (WACV 2021)
+│   ├── model_coord.py     # Proposed Coord-EfficientNet-B3 (Hou et al., CVPR 2021)
 │   ├── dataset.py         # PyTorch Dataset, augmentations, and stratified loaders
 │   ├── train.py           # General training engine (supports physical/custom splits)
 │   ├── train_80_20.py     # Base paper replication training script (80:20 split, B=8)
 │   ├── train_cbam.py      # CBAM training script (80:20 split, B=8)
 │   ├── train_triplet.py   # Triplet Attention training script (80:20 split, B=8)
+│   ├── train_coord.py     # Coordinate Attention training script (80:20 split, B=8)
 │   └── evaluate.py        # Evaluation, confusion matrix, and metrics generator
 ├── models/                # Saved checkpoints (.pth) and visual plots (.png)
 ├── benchmark_comparison.md# Complete descriptive comparison log
