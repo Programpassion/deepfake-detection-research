@@ -21,15 +21,15 @@ This project replicates, validates, and extends:
 
 ---
 
-## 📊 Current Experimental Benchmark (Phase 1 & Phase 2)
+## 📊 Current Experimental Benchmark (Phase 1 & Phase 2 - Batch Size = 8)
 
-Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Real, 1,000 Fake)** under an 80:20 stratified split:
+Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Real, 1,000 Fake)** under an 80:20 stratified split with exact base paper batch size ($B=8$):
 
 | Model Configuration | Attention Mechanism | Trainable Parameters | Overall Accuracy | Precision (Fake) | Recall (Fake) | F1-Score | ROC-AUC | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Base Paper Reported** *(Deepa et al.)* | *None* | ~10.91 M | **97.95%** | 0.9800 | 0.9800 | 0.9800 | — | Published |
-| **Model 1: Baseline Replicated** | *None* | 10.91 M | **98.00%** | 0.9829 | 0.9770 | 0.9799 | 0.9961 | **Completed** |
-| **Model 2: EfficientNet-B3 + CBAM** | Channel + Spatial ($7\times7$) | 11.20 M (+2.7%) | **97.95%** | **0.9848** | 0.9740 | 0.9794 | **0.9964** | **Completed** |
+| **Model 1: Baseline Replicated ($B=8$)** | *None* | 10.91 M | **98.10%** | **0.9859** | **0.9760** | **0.9809** | 0.9944 | **Completed** |
+| **Model 2: EfficientNet-B3 + CBAM ($B=8$)** | Channel + Spatial ($7\times7$) | 11.20 M (+2.7%) | **97.90%** | **0.9858** | 0.9720 | 0.9789 | **0.9960** | **Completed** |
 | **Model 3: EfficientNet-B3 + Triplet Attention** | Cross-Dimension Rotation | ~10.91 M (+0.002%) | *Pending* | *Pending* | *Pending* | *Pending* | *Pending* | Upcoming |
 | **Model 4: Proposed Coord-EfficientNet-B3** | 1D Positional ($X, Y$) | ~10.93 M (+0.18%) | *Pending* | *Pending* | *Pending* | *Pending* | *Pending* | Upcoming |
 
@@ -43,8 +43,8 @@ Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Rea
 │   ├── model_cbam.py      # EfficientNet-B3 + CBAM attention module
 │   ├── dataset.py         # PyTorch Dataset, augmentations, and stratified loaders
 │   ├── train.py           # General training engine (supports physical/custom splits)
-│   ├── train_80_20.py     # Base paper replication training script (80:20 split)
-│   ├── train_cbam.py      # CBAM training script (80:20 split)
+│   ├── train_80_20.py     # Base paper replication training script (80:20 split, B=8)
+│   ├── train_cbam.py      # CBAM training script (80:20 split, B=8)
 │   └── evaluate.py        # Evaluation, confusion matrix, and metrics generator
 ├── models/                # Saved checkpoints (.pth) and visual plots (.png)
 ├── benchmark_comparison.md# Complete descriptive comparison log
@@ -58,8 +58,8 @@ Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Rea
 
 ### 1. Clone the Repository
 ```bash
-git clone <YOUR_GITHUB_REPO_URL>
-cd "Deep Fake Detection Research"
+git clone https://github.com/Programpassion/deepfake-detection-research.git
+cd "deepfake-detection-research"
 ```
 
 ### 2. Create and Activate Virtual Environment
@@ -99,11 +99,11 @@ Deep Fake Detection Research/
 ```
 
 ### 5. Running Training & Evaluation
-To train the baseline model:
+To train the baseline model ($B=8$):
 ```bash
 python src/train_80_20.py
 ```
-To train the CBAM model:
+To train the CBAM model ($B=8$):
 ```bash
 python src/train_cbam.py
 ```

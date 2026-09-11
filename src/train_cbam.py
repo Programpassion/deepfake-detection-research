@@ -33,7 +33,7 @@ class InMemoryDeepFakeDataset(Dataset):
             image = self.transform(image)
         return image, torch.tensor([label], dtype=torch.float32)
 
-def build_80_20_loaders(data_dir, total_per_class=5000, batch_size=16, seed=42):
+def build_80_20_loaders(data_dir, total_per_class=5000, batch_size=8, seed=42):
     train_dir = os.path.join(data_dir, "Train")
     real_dir = os.path.join(train_dir, "Real")
     fake_dir = os.path.join(train_dir, "Fake")
@@ -132,7 +132,7 @@ def main():
     print(f"Device: {device} ({torch.cuda.get_device_name(0) if device.type == 'cuda' else 'CPU'})")
 
     print("\n--- Creating 80:20 Internal Stratified Split ---")
-    train_loader, test_loader = build_80_20_loaders(data_dir, total_per_class=5000, batch_size=16, seed=42)
+    train_loader, test_loader = build_80_20_loaders(data_dir, total_per_class=5000, batch_size=8, seed=42)
 
     print("\n--- Initializing EfficientNet-B3 + CBAM Model ---")
     model = EfficientNetB3CBAM(pretrained=True).to(device)

@@ -33,7 +33,7 @@ class InMemoryDeepFakeDataset(Dataset):
             image = self.transform(image)
         return image, torch.tensor([label], dtype=torch.float32)
 
-def build_80_20_loaders(data_dir, total_per_class=5000, batch_size=16, seed=42):
+def build_80_20_loaders(data_dir, total_per_class=5000, batch_size=8, seed=42):
     """
     Replicates the exact base paper setup (Section 4 & Section 11):
     - Pool of 5,000 Real + 5,000 Fake = 10,000 images total.
@@ -139,7 +139,7 @@ def main():
     print(f"Device: {device} ({torch.cuda.get_device_name(0) if device.type == 'cuda' else 'CPU'})")
 
     print("\n--- Creating 80:20 Internal Stratified Split (Matching Base Paper) ---")
-    train_loader, test_loader = build_80_20_loaders(data_dir, total_per_class=5000, batch_size=16, seed=42)
+    train_loader, test_loader = build_80_20_loaders(data_dir, total_per_class=5000, batch_size=8, seed=42)
 
     print("\n--- Initializing Baseline EfficientNet-B3 Model ---")
     model = EfficientNetB3Base(pretrained=True).to(device)
