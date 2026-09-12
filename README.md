@@ -29,18 +29,18 @@ Evaluated on an identical holdout test set of **2,000 balanced images (1,000 Rea
 | Model Configuration | Attention Mechanism | Trainable Params | Accuracy (Clean) | Precision | Recall | F1-Score | ROC-AUC | False Positives |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Base Paper Reported** *(Deepa et al.)* | *None* | ~10.91 M | **97.95%** | 0.9800 | 0.9800 | 0.9800 | — | 21 / 1,009 |
-| **Model 1: Baseline Replicated ($B=8$)** | *None* | 10.91 M | **98.10%** | 0.9859 | **0.9760** | **0.9809** | 0.9944 | 14 / 1,000 |
-| **Model 2: EfficientNet-B3 + CBAM ($B=8$)** | Channel + Spatial ($7\times7$) | 11.20 M (+2.7%) | **97.90%** | 0.9858 | 0.9720 | 0.9789 | **0.9960** | 14 / 1,000 |
-| **Model 3: EfficientNet-B3 + Triplet Attention ($B=8$)** | Cross-Dimension Rotation | **10.91 M (+0.003%)** | **98.05%** | 0.9878 | 0.9730 | 0.9804 | 0.9958 | 12 / 1,000 |
-| **Model 4: Proposed Coord-EfficientNet-B3 ($B=8$)** | 1D Positional ($X, Y$) | **11.12 M (+1.96%)** | **97.85%** | **0.9908** | 0.9660 | 0.9782 | 0.9958 | **9 / 1,000** 🏆 |
+| **Model 1: Baseline Replicated ($B=8$)** | *None* | 10.91 M | **98.10%** | 0.9859 | 0.9760 | **0.9809** | 0.9944 | 14 / 1,000 |
+| **Model 2: Residual CBAM ($B=8$, Fixed)** | Channel + Spatial ($7\times7$) | 11.20 M (+2.7%) | **98.05%** | **0.9898** 🏆 | 0.9710 | 0.9803 | 0.9953 | **10 / 1,000** 🏆 |
+| **Model 3: Residual Triplet ($B=8$, Fixed)** | Cross-Dimension Rotation | **10.91 M (+0.003%)** | **98.05%** | 0.9868 | 0.9740 | 0.9804 | **0.9968** 🏆 | 13 / 1,000 |
+| **Model 4: Proposed Residual CoordAttn** | 1D Positional ($X, Y$) | **11.12 M (+1.96%)** | **97.95%** | 0.9762 | **0.9830** 🏆 | 0.9796 | **0.9966** | 24 / 1,000 |
 
 ### 2. Social Media Robustness Benchmark: WhatsApp Compression (JPEG QF=50)
-| Model Configuration | Accuracy (QF=50) | Accuracy Drop ($\Delta$) | Precision (QF=50) | Recall | F1-Score | ROC-AUC | False Positives ($FP$) |
+| Model Configuration | Accuracy (QF=50) | Accuracy Drop ($\Delta$) | Precision (QF=50) | Recall (QF=50) | F1-Score | ROC-AUC | False Positives ($FP$) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Model 1: Baseline EfficientNet-B3** | **97.80%** | -0.30% | 0.9790 | **0.9770** | **0.9780** | 0.9926 | 21 / 1,000 |
-| **Model 2: EfficientNet-B3 + CBAM** | 96.85% | **-1.00% (Worst)** | 0.9652 | 0.9720 | 0.9686 | 0.9945 | 35 / 1,000 |
-| **Model 3: EfficientNet-B3 + Triplet Attention** | 97.25% | -0.80% | 0.9701 | 0.9750 | 0.9726 | 0.9945 | 30 / 1,000 |
-| **Model 4: Proposed Coord-EfficientNet-B3** | 97.25% | -0.55% | **0.9826** 🏆 | 0.9620 | 0.9722 | **0.9954** 🏆 | **17 / 1,000** 🏆 |
+| **Model 3: Residual Triplet Attention** | **97.95%** 🏆 | **-0.10%** 🏆 | **0.9819** 🏆 | 0.9770 | **0.9794** 🏆 | **0.9959** 🏆 | **18 / 1,000** 🏆 |
+| **Model 1: Baseline EfficientNet-B3** | 97.80% | -0.30% | 0.9790 | 0.9770 | 0.9780 | 0.9926 | 21 / 1,000 |
+| **Model 2: Residual CBAM** | 96.95% | -1.10% | 0.9681 | 0.9710 | 0.9695 | 0.9939 | 32 / 1,000 |
+| **Model 4: Proposed Residual CoordAttn** | 96.85% | -1.10% | 0.9553 | **0.9830** 🏆 | 0.9690 | 0.9957 | 46 / 1,000 |
 
 ---
 

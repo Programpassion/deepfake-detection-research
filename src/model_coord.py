@@ -2,33 +2,20 @@ import torch
 import torch.nn as nn
 import timm
 
-class h_sigmoid(nn.Module):
-    def __init__(self, inplace=True):
-        super(h_sigmoid, self).__init__()
-        self.relu = nn.ReLU6(inplace=inplace)
-
-    def forward(self, x):
-        return self.relu(x + 3) / 6
-
-class h_swish(nn.Module):
-    def __init__(self, inplace=True):
-        super(h_swish, self).__init__()
-        self.sigmoid = h_sigmoid(inplace=inplace)
-
-    def forward(self, x):
-        return x * self.sigmoid(x)
-
 class CoordAttention(nn.Module):
     """
-    Coordinate Attention for Efficient Mobile Network Design (Hou et al., CVPR 2021).
+    Coordinate Attention for Efficient Mobile Network Design (Hou et al., CVPR 2021)
+    with Residual Attention Formulation (Wang et al., CVPR 2017) and SiLU activation.
     
     Encodes spatial coordinate information into channel representations by factorizing
     2D global pooling into two 1D spatial pooling operations:
       - 1D Horizontal pooling: captures long-range dependencies along X-axis
       - 1D Vertical pooling: captures long-range dependencies along Y-axis
       
-    This enables the model to accurately locate boundary manipulations and micro-blending
-    artifacts even under aggressive spatial degradation.
+    Residual Attention Formulation:
+      out = identity * (1.0 + a_h * a_w)
+    This prevents the 75% signal suppression defect, allowing the ImageNet feature trunk
+    to flow at 100% full strength while the coordinate attention map amplifies manipulated boundaries.
     """
     def __init__(self, in_channels, out_channels, reduction=32):
         super(CoordAttention, self).__init__()
@@ -39,7 +26,7 @@ class CoordAttention(nn.Module):
 
         self.conv1 = nn.Conv2d(in_channels, mip, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn1 = nn.BatchNorm2d(mip)
-        self.act = h_swish()
+        self.act = nn.SiLU(inplace=True) # Native EfficientNet-B3 activation
         
         self.conv_h = nn.Conv2d(mip, out_channels, kernel_size=1, stride=1, padding=0, bias=False)
         self.conv_w = nn.Conv2d(mip, out_channels, kernel_size=1, stride=1, padding=0, bias=False)
@@ -66,16 +53,16 @@ class CoordAttention(nn.Module):
         a_h = torch.sigmoid(self.conv_h(x_h))     # (B, C, H, 1)
         a_w = torch.sigmoid(self.conv_w(x_w))     # (B, C, 1, W)
 
-        # Apply Coordinate Attention
-        out = identity * a_h * a_w
+        # Residual Coordinate Attention: Identity flows at 1.0, coordinate weights amplify manipulation cues
+        out = identity * (1.0 + a_h * a_w)
         return out
 
 class CoordEfficientNetB3(nn.Module):
     """
-    Model 4: Proposed Coordinate Attention EfficientNet-B3 (Coord-EfficientNet-B3).
+    Model 4: Proposed Residual Coordinate Attention EfficientNet-B3 (Coord-EfficientNet-B3).
     
     Backbone: EfficientNet-B3 (pretrained on ImageNet via timm)
-    Attention: Coordinate Attention module applied to 1536-dimensional feature map (7x7 resolution)
+    Attention: Residual Coordinate Attention module applied to 1536-dimensional feature map (7x7 resolution)
     Classifier Head (Base Paper 3-Stage MLP):
         Linear Layer 1: 1536 -> 128 with ReLU
         Dropout (rate = 0.3)
@@ -88,7 +75,7 @@ class CoordEfficientNetB3(nn.Module):
         self.backbone = timm.create_model('efficientnet_b3', pretrained=pretrained, num_classes=0)
         in_features = self.backbone.num_features # 1536
         
-        # Insert Coordinate Attention
+        # Insert Residual Coordinate Attention
         self.coord_att = CoordAttention(in_channels=in_features, out_channels=in_features, reduction=reduction)
         self.global_pool = nn.AdaptiveAvgPool2d(1)
         
@@ -119,10 +106,7 @@ if __name__ == "__main__":
     model = CoordEfficientNetB3(pretrained=False)
     dummy = torch.randn(2, 3, 224, 224)
     out = model(dummy)
-    print("Coord-EfficientNet-B3 forward pass successful!")
+    print("Residual Coord-EfficientNet-B3 forward pass successful!")
     print(f"Output shape: {out.shape}")
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Total Trainable Parameters: {total_params:,} ({total_params / 1e6:.2f}M)")
-    base_params = 10908449
-    diff = total_params - base_params
-    print(f"Added parameters over baseline: +{diff:,} (+{diff / base_params * 100:.2f}%)")

@@ -4,8 +4,8 @@ import timm
 
 class ChannelAttention(nn.Module):
     """
-    CBAM Channel Attention Module (Woo et al., ECCV 2018).
-    Squeezes spatial dimensions via AvgPool and MaxPool, passes through a shared MLP
+    CBAM Channel Attention Module with SiLU activation matching EfficientNet-B3.
+    Squeezes spatial dimensions via AdaptiveAvgPool and AdaptiveMaxPool, passes through a shared MLP
     with reduction ratio r, and applies Sigmoid gating.
     """
     def __init__(self, in_planes, ratio=16):
@@ -16,7 +16,7 @@ class ChannelAttention(nn.Module):
         reduced_planes = max(8, in_planes // ratio)
         self.fc = nn.Sequential(
             nn.Conv2d(in_planes, reduced_planes, 1, bias=False),
-            nn.ReLU(inplace=True),
+            nn.SiLU(inplace=True), # Native EfficientNet-B3 activation
             nn.Conv2d(reduced_planes, in_planes, 1, bias=False)
         )
         self.sigmoid = nn.Sigmoid()
@@ -29,25 +29,29 @@ class ChannelAttention(nn.Module):
 
 class SpatialAttention(nn.Module):
     """
-    CBAM Spatial Attention Module (Woo et al., ECCV 2018).
-    Applies AvgPool and MaxPool along the channel dimension, concatenates them (2 channels),
-    and applies a 7x7 convolution followed by Sigmoid gating.
+    CBAM Spatial Attention Module with BatchNorm stabilization.
+    Applies AvgPool and MaxPool along channel dimension, concatenates them (2 channels),
+    and applies a 7x7 convolution + BatchNorm followed by Sigmoid gating.
     """
     def __init__(self, kernel_size=7):
         super(SpatialAttention, self).__init__()
         self.conv = nn.Conv2d(2, 1, kernel_size=kernel_size, padding=kernel_size // 2, bias=False)
+        self.bn = nn.BatchNorm2d(1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         avg_out = torch.mean(x, dim=1, keepdim=True)
         max_out, _ = torch.max(x, dim=1, keepdim=True)
         x_cat = torch.cat([avg_out, max_out], dim=1)
-        out = self.conv(x_cat)
-        return self.sigmoid(out)
+        out = self.sigmoid(self.bn(self.conv(x_cat)))
+        return out
 
 class CBAM(nn.Module):
     """
-    Convolutional Block Attention Module (CBAM) combining Channel Attention and Spatial Attention sequentially.
+    Convolutional Block Attention Module (CBAM) with Residual Attention Formulation (Wang et al., CVPR 2017).
+    
+    Prevents the 73% signal suppression defect by preserving the ImageNet feature trunk via identity branch:
+        out = x * (1.0 + ChannelAttn(x) * SpatialAttn(x))
     """
     def __init__(self, in_planes, ratio=16, kernel_size=7):
         super(CBAM, self).__init__()
@@ -55,16 +59,17 @@ class CBAM(nn.Module):
         self.sa = SpatialAttention(kernel_size=kernel_size)
 
     def forward(self, x):
-        x = x * self.ca(x)
-        x = x * self.sa(x)
-        return x
+        att = self.ca(x) * self.sa(x)
+        # Residual gating: Identity flows at 1.0, attention amplifies discriminative manipulation cues
+        out = x * (1.0 + att)
+        return out
 
 class EfficientNetB3CBAM(nn.Module):
     """
-    Model 2: EfficientNet-B3 + CBAM Architecture.
+    Model 2: EfficientNet-B3 + Residual CBAM Architecture.
     
     Backbone: EfficientNet-B3 (pretrained on ImageNet via timm)
-    Attention: CBAM applied to final 1536-dimensional feature map (7x7 spatial resolution)
+    Attention: Residual CBAM applied to final 1536-dimensional feature map (7x7 spatial resolution)
     Classifier Head (strictly matching Base Paper 3-Stage MLP):
         Linear Layer 1: 1536 -> 128 with ReLU
         Dropout (rate = 0.3)
@@ -77,7 +82,7 @@ class EfficientNetB3CBAM(nn.Module):
         self.backbone = timm.create_model('efficientnet_b3', pretrained=pretrained, num_classes=0)
         in_features = self.backbone.num_features # 1536 for B3
         
-        # Insert CBAM at the final feature map bottleneck
+        # Insert Residual CBAM at the final feature map bottleneck
         self.cbam = CBAM(in_planes=in_features, ratio=16, kernel_size=7)
         self.global_pool = nn.AdaptiveAvgPool2d(1)
         
@@ -95,11 +100,11 @@ class EfficientNetB3CBAM(nn.Module):
     def forward(self, x):
         # Extract 2D feature map from backbone: Shape (B, 1536, 7, 7)
         feat_map = self.backbone.forward_features(x)
-        # Refine feature map using Channel + Spatial attention
+        # Refine feature map using Residual Channel + Spatial attention
         refined_map = self.cbam(feat_map)
         # Pool to 1D vector: (B, 1536)
         pooled = self.global_pool(refined_map).flatten(1)
-        # Classify: (B, 1)
+        # Classify through 3-stage custom MLP
         logits = self.classifier(pooled)
         return logits
 
@@ -112,7 +117,7 @@ if __name__ == "__main__":
     model = EfficientNetB3CBAM(pretrained=False)
     dummy = torch.randn(2, 3, 224, 224)
     out = model(dummy)
-    print("EfficientNet-B3 + CBAM forward pass successful!")
+    print("Residual EfficientNet-B3 + CBAM forward pass successful!")
     print(f"Output shape: {out.shape}")
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Total Trainable Parameters: {total_params:,} ({total_params / 1e6:.2f}M)")

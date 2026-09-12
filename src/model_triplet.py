@@ -70,7 +70,8 @@ class TripletAttention(nn.Module):
         # Branch 3: Spatial (H, W) interaction
         out_hw = self.hw(x)
 
-        return (out_cw + out_hc + out_hw) / 3.0
+        # Residual Triplet Attention: Preserves ImageNet trunk (1.0) and adds cross-dimension attention
+        return x + (out_cw + out_hc + out_hw) / 3.0
 
 class EfficientNetB3Triplet(nn.Module):
     """
