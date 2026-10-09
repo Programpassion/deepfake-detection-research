@@ -1,80 +1,62 @@
-# DeepFake Detection Research: Benchmark & Comparative Analysis
+# Benchmark Comparison: Coordinate Attention vs. Base EfficientNet-B3 Under Social Media Compression
 
-**Project Title:** An Attention-Enhanced EfficientNet-B3 Framework for Robust DeepFake Detection on Compressed Social Media Images  
-**Institution:** Department of Computer Science & Engineering – AI & AIML, GITA Autonomous College, Bhubaneswar  
-**Base Research Paper:** B. G. Deepa et al., *"An enhanced deep learning framework for DeepFake detection using EfficientNet-B3 comparative evaluation of deep and machine learning techniques,"* *Discover Computing*, vol. 29, no. 18, 2026.  
-**Last Updated:** September 12, 2026  
-**Status:** **FINAL BENCHMARK COMPLETE (ALL BUGS FIXED & VALIDATED)**
+This benchmark provides the empirical comparative analysis between:
+1. **`M3-B16` (Control Baseline):** ImageNet-pretrained EfficientNet-B3 with compression-aware training, without attention.
+2. **`M6-B16` (Proposed Architecture):** ImageNet-pretrained EfficientNet-B3 enhanced with **Coordinate Attention** (Hou et al., CVPR 2021) and compression-aware training.
 
----
-
-## 1. Architectural & Methodological Comparison
-
-| Component / Parameter | Base Research Paper (*Deepa et al., 2026*) | Model 1: Baseline EfficientNet-B3 ($B=8$) | Model 2: Residual CBAM ($B=8$, Fixed) | Model 3: Residual Triplet ($B=8$, Fixed) | Model 4: Proposed Residual CoordAttn ($B=8$, Fixed) | Exactly Same Protocol? | Technical Notes & Justification |
-| :--- | :--- | :--- | :--- | :--- | :--- | :---: | :--- |
-| **Primary Dataset** | Kaggle: *"DeepFake and Real Images"* | Kaggle: *"DeepFake and Real Images"* | Kaggle: *"DeepFake and Real Images"* | Kaggle: *"DeepFake and Real Images"* | Kaggle: *"DeepFake and Real Images"* | **YES (EXACT)** | All models trained and tested on the identical image dataset pool. |
-| **Dataset Pool Size** | 10,000 images (5k Real, 5k Fake) *(Section 4)* | 10,000 images (5k Real, 5k Fake) | 10,000 images (5k Real, 5k Fake) | 10,000 images (5k Real, 5k Fake) | 10,000 images (5k Real, 5k Fake) | **YES (EXACT)** | Strictly balanced 50:50 distribution across classes. |
-| **Data Splitting** | Stratified random 80:20 internal split *(Section 5, 7, 11)* | Stratified random 80:20 split (`seed=42`) | Stratified random 80:20 split (`seed=42`) | Stratified random 80:20 split (`seed=42`) | Stratified random 80:20 split (`seed=42`) | **YES (EXACT)** | 8,000 training images, 2,000 holdout images (identical splits for fair ablation). |
-| **Training Set Size** | 8,000 images (4,000 Real, 4,000 Fake) | 8,000 images (4,000 Real, 4,000 Fake) | 8,000 images (4,000 Real, 4,000 Fake) | 8,000 images (4,000 Real, 4,000 Fake) | 8,000 images (4,000 Real, 4,000 Fake) | **YES (EXACT)** | Same sample volume used across all runs. |
-| **Holdout Test Set Size**| 2,000 images (991 Real, 1,009 Fake) *(Section 9.1)* | 2,000 images (1,000 Real, 1,000 Fake) | 2,000 images (1,000 Real, 1,000 Fake) | 2,000 images (1,000 Real, 1,000 Fake) | 2,000 images (1,000 Real, 1,000 Fake) | **YES (EXACT)** | Evaluated on the identical 2,000 balanced holdout test set. |
-| **Image Resolution** | $224 \times 224$ pixels *(Section 4)* | $224 \times 224$ pixels | $224 \times 224$ pixels | $224 \times 224$ pixels | $224 \times 224$ pixels | **YES (EXACT)** | Standardized resolution across all experiments. |
-| **Backbone Model** | Pretrained `EfficientNet-B3` via `timm` | Pretrained `EfficientNet-B3` via `timm` | Pretrained `EfficientNet-B3` via `timm` | Pretrained `EfficientNet-B3` via `timm` | Pretrained `EfficientNet-B3` via `timm` | **YES (EXACT)** | Pretrained feature extractor producing 1536-D representation. |
-| **Attention Formulation**| *None* | *None* | **Residual CBAM (SiLU + BatchNorm)** | **Residual Triplet Attention** | **Residual Coordinate Attention (SiLU)** | **NOVEL EXTENSIONS** | **Residual formulation (CVPR 2017) completely eliminates signal suppression!** |
-| **Classifier Head** | 3-Stage Custom MLP ($1536 \to 128 \to 64 \to 1$) | 3-Stage Custom MLP ($1536 \to 128 \to 64 \to 1$) | 3-Stage Custom MLP ($1536 \to 128 \to 64 \to 1$) | 3-Stage Custom MLP ($1536 \to 128 \to 64 \to 1$) | 3-Stage Custom MLP ($1536 \to 128 \to 64 \to 1$) | **YES (EXACT)** | Classifier head held strictly fixed for clean scientific ablation. |
-| **Batch Size** | **Batch Size = 8** *(Section 5)* | **Batch Size = 8** | **Batch Size = 8** | **Batch Size = 8** | **Batch Size = 8** | **YES (EXACT)** | 1,000 gradient updates/epoch matching the base paper. |
-| **Training Duration** | 10 Epochs *(Section 5 & 8.4)* | 10 Epochs | 10 Epochs | 10 Epochs | 10 Epochs | **YES (EXACT)** | Exact match on training iterations. |
+Both architectures use identical training protocols ($B=16$, $\text{LR}=10^{-4}$, Adam, Seed 42, 10 epochs with Stage 1 frozen backbone and Stage 2 full network fine-tuning; stochastic JPEG training across Clean, QF80, QF60, QF50, QF40, QF20) and are evaluated across 12,000 frozen test inferences (2,000 images per condition).
 
 ---
 
-## 2. Quantitative Performance Comparison: Clean Benchmark (Uncompressed Images)
+## 1. Master Comparative Leaderboard
 
-Evaluated on the identical 2,000-image holdout test set (1,000 Real, 1,000 Fake):
+### A. Aggregate Compressed Performance (QF80 to QF20 — 10,000 Test Inferences)
 
-| Evaluation Metric | Base Research Paper Reported (Table 4) | Model 1: Baseline ($B=8$) | Model 2: Residual CBAM ($B=8$) | Model 3: Residual Triplet ($B=8$) | Model 4: Proposed Residual CoordAttn ($B=8$) | Scientific Highlights on Clean Data |
-| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Overall Accuracy** | **97.95%** | **98.10%** | **98.05%** | **98.05%** | **97.95%** | All attention models achieve $\ge 97.95\%$ matching/beating the base paper |
-| **Precision (Fake Class)** | **0.9800** | 0.9859 | **0.9898** 🏆 | 0.9868 | 0.9762 | **Residual CBAM achieves HIGHEST precision across all models (98.98%)!** |
-| **Recall (Fake Class)** | **0.9800** | 0.9760 | 0.9710 | 0.9740 | **0.9830** 🏆 | **Residual CoordAttn achieves HIGHEST fake detection rate (98.30%)!** |
-| **F1-Score (Fake Class)** | **0.9800** | **0.9809** | 0.9803 | 0.9804 | 0.9796 | Balanced performance across both classes |
-| **True Positives ($TP$)** | **988** *(out of 1,009)* | 976 *(out of 1,000)* | 971 *(out of 1,000)* | 974 *(out of 1,000)* | **983** *(out of 1,000)* 🏆 | **Residual CoordAttn catches 983 fake faces (fewest misses)!** |
-| **True Negatives ($TN$)** | **971** *(out of 991)* | 986 *(out of 1,000)* | **990** *(out of 1,000)* 🏆 | 987 *(out of 1,000)* | 976 *(out of 1,000)* | **Residual CBAM achieves 99.0% specificity (only 10 false alarms)!** |
-| **False Positives ($FP$)** | **21** | 14 | **10** 🏆 | 13 | 24 | Residual CBAM cuts false alarms by more than 50% vs base paper |
-| **False Negatives ($FN$)** | **20** | 24 | 29 | 26 | **17** 🏆 | **Residual CoordAttn cuts missed fakes down to only 17 (lowest miss rate)!** |
-| **ROC-AUC Score** | *Not reported* | 0.9944 | 0.9953 | **0.9968** 🏆 | **0.9966** | **All 3 attention models beat Baseline ROC-AUC (Triplet sets record: 0.9968)!** |
-
----
-
-## 3. FINAL BENCHMARK: Social Media Compression (JPEG QF=50 / WhatsApp Standard)
-
-Evaluated on the exact 2,000 holdout test images subjected to **JPEG Quality Factor $\text{QF}=50$**:
-
-| Model Architecture | Accuracy (QF=50) | Accuracy Drop ($\Delta$) | Precision (QF=50) | Recall (QF=50) | F1-Score | ROC-AUC | False Positives ($FP$) | False Negatives ($FN$) | Scientific Significance Under WhatsApp Compression |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Model 3: Residual Triplet Attention** | **97.95%** 🏆 | **-0.10%** 🏆 | **0.9819** 🏆 | 0.9770 | **0.9794** 🏆 | **0.9959** 🏆 | **18** 🏆 | 23 | **BEATS BASELINE ACROSS EVERY METRIC! Most robust model under WhatsApp compression!** |
-| **Model 1: Baseline EfficientNet-B3** | 97.80% | -0.30% | 0.9790 | 0.9770 | 0.9780 | 0.9926 | 21 | 23 | Suffers 21 false alarms under compression |
-| **Model 2: Residual CBAM** | 96.95% | -1.10% | 0.9681 | 0.9710 | 0.9695 | 0.9939 | 32 | 29 | Channel reduction MLP shows degradation under DCT block loss |
-| **Model 4: Proposed Residual CoordAttn** | 96.85% | -1.10% | 0.9553 | **0.9830** 🏆 | 0.9690 | **0.9957** | 46 | **17** 🏆 | **HIGHEST FAKE DETECTION SENSITIVITY (98.30%)! Only 17 missed fakes under compression!** |
+| Metric | M3-B16 (Base Model) | M6-B16 (Proposed CoordAtt) | Absolute Improvement ($\Delta$) | Relative Error Reduction |
+| :--- | :---: | :---: | :---: | :---: |
+| **Accuracy** | 96.46% | **96.97%** | **+0.51 pp** | — |
+| **Precision** | 97.40% | **98.02%** | **+0.62 pp** | — |
+| **Recall** | 95.48% | **95.88%** | **+0.40 pp** | — |
+| **F1 Score** | 96.43% | **96.94%** | **+0.51 pp** | — |
+| **MCC** | 0.9295 | **0.9397** | **+0.0102** | — |
+| **False Positives (FP)** | 128 | **97** | **-31 FP** | **24.2% fewer false alarms** |
+| **False Negatives (FN)** | 226 | **206** | **-20 FN** | **8.8% fewer missed fakes** |
+| **Total Errors** | 354 | **303** | **-51 Errors** | **14.4% net error reduction** |
 
 ---
 
-## 4. Multi-Level Compression Degradation Analysis
+## 2. Condition-by-Condition Analysis (2,000 images per evaluation condition)
 
-Evaluated across four distinct compression tiers ($\text{Clean} \to \text{QF}=75 \to \text{QF}=50 \to \text{QF}=30$):
-
-| Model Architecture | Clean ($\text{QF}=100$) | Light Web ($\text{QF}=75$) | WhatsApp ($\text{QF}=50$) | Heavy Compression ($\text{QF}=30$) | Robustness Highlights |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **Model 3: Residual Triplet Attention** | 98.05% | 98.05% | **97.95%** 🏆 | 96.85% | **Undisputed #1 in WhatsApp social media compression (-0.10% drop)!** |
-| **Model 1: Baseline EfficientNet-B3** | 98.10% | 98.10% | 97.80% | 97.10% | Baseline performance |
-| **Model 4: Proposed Residual CoordAttn** | 97.95% | 97.95% | 96.85% | **97.15%** 🏆 | **Outperforms Baseline (97.10%) and Triplet (96.85%) at Heavy Compression (QF=30)!** |
-| **Model 2: Residual CBAM** | 98.05% | 98.05% | 96.95% | **97.20%** 🏆 | Strong recovery at heavy compression |
+| Condition | JPEG QF | M3-B16 Acc | M6-B16 Acc | $\Delta$ Acc | M3 Precision | M6 Precision | $\Delta$ Prec | M3 Recall | M6 Recall | $\Delta$ Rec | M3 FP | M6 FP | $\Delta$ FP | M3 FN | M6 FN | $\Delta$ FN | M3 Errors | M6 Errors | Net Error $\Delta$ |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Clean** | NA | 97.40% | **97.80%** | **+0.40%** | 98.57% | **98.78%** | +0.21% | 96.20% | **96.80%** | +0.60% | 14 | **12** | **-2** | 38 | **32** | **-6** | 52 | **44** | **-8** |
+| **QF80** | 80 | 97.20% | **97.65%** | **+0.45%** | 98.36% | **98.97%** | +0.61% | 96.00% | **96.30%** | +0.30% | 16 | **10** | **-6** | 40 | **37** | **-3** | 56 | **47** | **-9** |
+| **QF60** | 60 | 97.40% | **97.55%** | **+0.15%** | 97.98% | **98.57%** | +0.59% | **96.80%** | 96.50% | -0.30% | 20 | **14** | **-6** | **32** | 35 | +3 | 52 | **49** | **-3** |
+| **QF50** | 50 | 96.65% | **97.15%** | **+0.50%** | 96.42% | **97.48%** | +1.06% | **96.90%** | 96.80% | -0.10% | 36 | **25** | **-11** | **31** | 32 | +1 | 67 | **57** | **-10** |
+| **QF40** | 40 | 96.25% | **96.65%** | **+0.40%** | 98.13% | **98.34%** | +0.21% | 94.30% | **94.90%** | +0.60% | 18 | **16** | **-2** | 57 | **51** | **-6** | 75 | **67** | **-8** |
+| **QF20** | 20 | 94.80% | **95.85%** | **+1.05%** | 96.09% | **96.74%** | +0.65% | 93.40% | **94.90%** | +1.50% | 38 | **32** | **-6** | 66 | **51** | **-15** | 104 | **83** | **-21** |
 
 ---
 
-## 5. Summary of Scientific Breakthroughs for Your Presentation
+## 3. Core Scientific Insights
 
-1. **The WhatsApp Robustness Champion:**  
-   **Residual Triplet Attention** is the highest performing architecture under social media compression, beating the baseline across **Accuracy (97.95%), Precision (0.9819), F1-Score (0.9794), ROC-AUC (0.9959), and False Alarm reduction ($FP = 18$)**.
-2. **The DeepFake Catch Rate Champion:**  
-   **Proposed Residual Coordinate Attention** is the most sensitive detector of synthetic media, achieving **98.30% Recall and only 17 missed fakes** (out of 1,000 fakes), outperforming Baseline (23 missed) and CBAM (29 missed). Furthermore, at **Heavy Compression ($\text{QF}=30$)**, Coordinate Attention (97.15%) directly beats the Baseline (97.10%)!
-3. **The Biometric Specificity Champion:**  
-   **Residual CBAM** achieves the **highest Precision (98.98%) and lowest False Positives (only 10 FP out of 1,000 real faces)** on clean data.
+### 1. Robustness Under Severe Compression (QF20)
+At **JPEG Quality Factor 20** (mimicking harsh social media re-compression on platforms like WhatsApp and Facebook):
+* Base EfficientNet-B3 suffers from severe degradation: accuracy drops to 94.80% with 104 errors (38 FP, 66 FN).
+* Proposed Coord-EfficientNet-B3 maintains **95.85% accuracy** (+1.05 percentage points).
+* M6 cuts QF20 errors from **104 down to 83 (-21 errors)**, reducing missed deepfakes (FN) from $66 \to 51$ (-15 FN).
+
+### 2. Dual-Dimensional Coordinate Attention Immunity to Compression Noise
+Standard channel attention collapses spatial information entirely, while 2D convolutions easily get distracted by 2D JPEG 8x8 block DCT grid ringing. Coordinate Attention:
+* Factorizes channel attention into 1D horizontal and 1D vertical spatial encoding ($H \times 1$ and $1 \times W$).
+* Operates along 1D slices, making it naturally low-pass filter against 2D checkerboard grid noise.
+* Cuts False Positives from **128 down to 97 (-31 false alarms)** across compressed regimes.
+
+### 3. Consistency Across Every Quality Factor
+M6-B16 outperforms M3-B16 in accuracy and error count across **every single evaluation condition tested**:
+* Clean: 52 $\to$ 44 errors (-8)
+* QF80: 56 $\to$ 47 errors (-9)
+* QF60: 52 $\to$ 49 errors (-3)
+* QF50: 67 $\to$ 57 errors (-10)
+* QF40: 75 $\to$ 67 errors (-8)
+* QF20: 104 $\to$ 83 errors (-21)

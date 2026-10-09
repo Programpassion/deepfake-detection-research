@@ -1,0 +1,28 @@
+{
+    "experiment_name": "Phase 5.B: M6-B16 (Compression-Aware EfficientNet-B3 + Coordinate Attention, Batch 16)",
+    "model_name": "M6-B16",
+    "attention_mechanism": "Coordinate Attention (Hou et al., CVPR 2021: 1D H-pool + 1D W-pool)",
+    "reduction_ratio": 32,
+    "classifier": "Linear(1536,128) -> ReLU -> Dropout(0.3) -> Linear(128,64) -> ReLU -> Dropout(0.2) -> Linear(64,1)",
+    "loss_function": "BCEWithLogitsLoss",
+    "optimizer": "Adam",
+    "backbone_lr": 0.0001,
+    "coordatt_lr": 0.0001,
+    "classifier_lr": 0.0001,
+    "batch_size": 16,
+    "num_epochs": 10,
+    "stage1_epochs": 2,
+    "stage2_epochs": 8,
+    "random_seed": 42,
+    "compression_sampling_probabilities": {
+        "Clean": 0.5,
+        "QF80": 0.1,
+        "QF60": 0.1,
+        "QF50": 0.1,
+        "QF40": 0.1,
+        "QF20": 0.1
+    },
+    "validation_protocol": "Clean Standardized val.csv (800 images)",
+    "checkpoint_selection": "Best clean validation accuracy",
+    "decision_threshold": 0.5
+}

@@ -1,0 +1,182 @@
+[
+    {
+        "epoch": 1,
+        "stage": "STAGE 1: BACKBONE FROZEN (CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.6231397343344158,
+        "train_acc": 0.6788888888888889,
+        "val_loss": 0.48304957449436187,
+        "val_acc": 0.79125,
+        "epoch_time": 53.42058873176575,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3581,
+            "QF80": 714,
+            "QF60": 768,
+            "QF50": 726,
+            "QF40": 715,
+            "QF20": 696
+        }
+    },
+    {
+        "epoch": 2,
+        "stage": "STAGE 1: BACKBONE FROZEN (CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.4597315821382735,
+        "train_acc": 0.7870833333333334,
+        "val_loss": 0.4250506716966629,
+        "val_acc": 0.81125,
+        "epoch_time": 67.39440560340881,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3622,
+            "QF80": 676,
+            "QF60": 724,
+            "QF50": 716,
+            "QF40": 710,
+            "QF20": 752
+        }
+    },
+    {
+        "epoch": 3,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.29257345110177996,
+        "train_acc": 0.8802777777777778,
+        "val_loss": 0.1381353423371911,
+        "val_acc": 0.95625,
+        "epoch_time": 268.8559293746948,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3547,
+            "QF80": 763,
+            "QF60": 693,
+            "QF50": 738,
+            "QF40": 749,
+            "QF20": 710
+        }
+    },
+    {
+        "epoch": 4,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.1410598316354056,
+        "train_acc": 0.9408333333333333,
+        "val_loss": 0.08993841718882323,
+        "val_acc": 0.96,
+        "epoch_time": 295.20623803138733,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3663,
+            "QF80": 680,
+            "QF60": 753,
+            "QF50": 719,
+            "QF40": 682,
+            "QF20": 703
+        }
+    },
+    {
+        "epoch": 5,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.10347540211346415,
+        "train_acc": 0.9640277777777778,
+        "val_loss": 0.08257071111351251,
+        "val_acc": 0.965,
+        "epoch_time": 297.75618743896484,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3631,
+            "QF80": 729,
+            "QF60": 694,
+            "QF50": 728,
+            "QF40": 727,
+            "QF20": 691
+        }
+    },
+    {
+        "epoch": 6,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.07285937486953722,
+        "train_acc": 0.9726388888888889,
+        "val_loss": 0.07748693075962365,
+        "val_acc": 0.965,
+        "epoch_time": 286.14983224868774,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3614,
+            "QF80": 678,
+            "QF60": 745,
+            "QF50": 674,
+            "QF40": 729,
+            "QF20": 760
+        }
+    },
+    {
+        "epoch": 7,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.047862691706039996,
+        "train_acc": 0.9815277777777778,
+        "val_loss": 0.10570910980488407,
+        "val_acc": 0.96125,
+        "epoch_time": 290.690021276474,
+        "is_best": false,
+        "condition_samples": {
+            "Clean": 3623,
+            "QF80": 682,
+            "QF60": 751,
+            "QF50": 746,
+            "QF40": 710,
+            "QF20": 688
+        }
+    },
+    {
+        "epoch": 8,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.03752115657709914,
+        "train_acc": 0.9854166666666667,
+        "val_loss": 0.09470648698144941,
+        "val_acc": 0.975,
+        "epoch_time": 280.6371183395386,
+        "is_best": true,
+        "condition_samples": {
+            "Clean": 3592,
+            "QF80": 719,
+            "QF60": 725,
+            "QF50": 708,
+            "QF40": 682,
+            "QF20": 774
+        }
+    },
+    {
+        "epoch": 9,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.035682559691637535,
+        "train_acc": 0.9893055555555555,
+        "val_loss": 0.13734559333272045,
+        "val_acc": 0.9725,
+        "epoch_time": 279.6202745437622,
+        "is_best": false,
+        "condition_samples": {
+            "Clean": 3579,
+            "QF80": 705,
+            "QF60": 720,
+            "QF50": 704,
+            "QF40": 726,
+            "QF20": 766
+        }
+    },
+    {
+        "epoch": 10,
+        "stage": "STAGE 2: FULL NETWORK FINE-TUNING (Backbone lr=1e-4, CoordAtt lr=1e-4, Head lr=1e-4)",
+        "train_loss": 0.02532171670828878,
+        "train_acc": 0.9918055555555556,
+        "val_loss": 0.10942576867702883,
+        "val_acc": 0.97125,
+        "epoch_time": 283.26861357688904,
+        "is_best": false,
+        "condition_samples": {
+            "Clean": 3586,
+            "QF80": 721,
+            "QF60": 754,
+            "QF50": 697,
+            "QF40": 719,
+            "QF20": 723
+        }
+    }
+]

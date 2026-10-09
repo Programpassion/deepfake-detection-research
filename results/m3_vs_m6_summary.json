@@ -1,0 +1,42 @@
+{
+    "experiment_title": "Comparative Analysis: M3-B16 (Base EfficientNet-B3) vs. M6-B16 (Coord-EfficientNet-B3)",
+    "target_problem": "DeepFake Detection Robustness under Social Media Compression (JPEG QF80, QF60, QF50, QF40, QF20)",
+    "batch_size": 16,
+    "epochs": 10,
+    "optimizer": "Adam",
+    "learning_rate": 0.0001,
+    "decision_threshold": 0.50,
+    "compressed_aggregate_10k_inferences": {
+        "m3_b16_base": {
+            "accuracy": 96.46,
+            "precision": 97.40,
+            "recall": 95.48,
+            "f1_score": 96.43,
+            "mcc": 0.9295,
+            "FP": 128,
+            "FN": 226,
+            "total_errors": 354
+        },
+        "m6_b16_coordatt": {
+            "accuracy": 96.97,
+            "precision": 98.02,
+            "recall": 95.88,
+            "f1_score": 96.94,
+            "mcc": 0.9397,
+            "FP": 97,
+            "FN": 206,
+            "total_errors": 303
+        },
+        "coordinate_attention_improvements": {
+            "delta_accuracy_pp": +0.51,
+            "delta_precision_pp": +0.62,
+            "delta_recall_pp": +0.40,
+            "delta_mcc": +0.0102,
+            "fp_reduction": -31,
+            "fn_reduction": -20,
+            "net_error_reduction": -51,
+            "qf20_severe_compression_accuracy_gain_pp": +1.05,
+            "qf20_error_reduction": -21
+        }
+    }
+}

@@ -10,22 +10,22 @@ __pycache__/
 *$py.class
 *.so
 
-# DATASETS - CRITICAL (Do NOT push 190,000 image files to GitHub)
+# DATASETS - CRITICAL (Do NOT push raw image files to GitHub)
 Train/
 Validation/
 Test/
 dataset/
-*.jpg
-*.jpeg
-*.png
-!models/*.png
+*.zip
+*.tar
+*.gz
 
-# Model Weights / Checkpoints (Large binaries > 40MB)
-# Uncomment the line below if you prefer sharing .pth via Google Drive/Git LFS
-# models/*.pth
+# Allow documentation and figures
+!visualizations/**
+!models/*.png
 
 # IDE and OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+*.log

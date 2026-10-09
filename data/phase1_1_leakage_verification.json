@@ -1,0 +1,18 @@
+{
+    "total_images": 10000,
+    "exact_duplicate_groups": 55,
+    "near_duplicate_groups": 79,
+    "cross_split_exact_duplicate_groups": 0,
+    "near_duplicate_dhash_cross_split": 9,
+    "train_count": 7200,
+    "train_real": 3600,
+    "train_fake": 3600,
+    "val_count": 800,
+    "val_real": 400,
+    "val_fake": 400,
+    "test_count": 2000,
+    "test_real": 1000,
+    "test_fake": 1000,
+    "status": "PASSED_AND_FROZEN",
+    "random_seed": 42
+}
