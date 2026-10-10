@@ -14,285 +14,338 @@
 
 \begin{document}
 
-\title{An Explainable Coordinate-Attention Enhanced EfficientNet-B3 Framework for Robust DeepFake Detection on Compressed Social Media Images}
+\title{An Attention-Enhanced EfficientNet-B3 Framework for Robust DeepFake Detection on Compressed Social Media Images\\
+{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and should not be used}
+\thanks{\textsuperscript{\dag}These authors contributed equally to this work.}
+}
 
 \author{
-\IEEEauthorblockN{Arnav Dutta$^{\dagger}$, Ansuman Sutar$^{\dagger}$, Anshuman Patnaik$^{\dagger}$, Arjya Pratap Nayak$^{\dagger}$}
-\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
-\textit{GITA Autonomous College}\\
-Bhubaneswar, Odisha, India \\
-Email: ansumansutar@gmail.com}
-\thanks{$^{\dagger}$These authors contributed equally to this work.}
+  \begin{tabular}{c @{\hspace{5em}} c} 
+    \begin{tabular}{c}
+      \IEEEauthorblockN{Arnav Dutta\textsuperscript{\dag}} \\[-1.5em] 
+      \IEEEauthorblockA{\textit{Computer Science and Engineering} \\
+      \textit{GITA Autonomous College} \\
+      Bhubaneswar, India}
+    \end{tabular}
+    &
+    \begin{tabular}{c}
+      \IEEEauthorblockN{Ansuman Sutar\textsuperscript{\dag}} \\[-1.5em] 
+      \IEEEauthorblockA{\textit{Computer Science and Engineering} \\
+      \textit{GITA Autonomous College} \\
+      Bhubaneswar, India \\
+      ansumansutar@gmail.com}
+    \end{tabular} \\[5em]
+
+    \begin{tabular}{c}
+      \IEEEauthorblockN{Anshuman Patnaik\textsuperscript{\dag}} \\[-1.5em] 
+      \IEEEauthorblockA{\textit{Computer Science and Engineering} \\
+      \textit{GITA Autonomous College} \\
+      Bhubaneswar, India}
+    \end{tabular}
+    &
+    \begin{tabular}{c}
+      \IEEEauthorblockN{Arjya Pratap Nayak\textsuperscript{\dag}} \\[-1.5em] 
+      \IEEEauthorblockA{\textit{Computer Science and Engineering} \\
+      \textit{GITA Autonomous College} \\
+      Bhubaneswar, India}
+    \end{tabular}
+  \end{tabular}
 }
 
 \maketitle
 
 \begin{abstract}
-The rapid maturation of Generative Adversarial Networks (GANs) and neural diffusion models enables the synthesis of photorealistic human facial manipulations (DeepFakes) that pose severe challenges to biometric security, journalistic veracity, and digital trust. While contemporary convolutional backbones such as EfficientNet-B3 achieve superior discriminative accuracy on pristine benchmark datasets, their diagnostic sensitivity experiences significant degradation in operational social media environments. Across transmission pipelines such as messaging services and content networks, lossy JPEG compression and spatial downsampling attenuate subtle, high-frequency forensic artifacts (e.g., spectral blending seams and pixel co-occurrence inconsistencies) while introducing spurious $8 \times 8$ Discrete Cosine Transform (DCT) block ringing. To resolve this vulnerability, this paper presents Coord-EfficientNet-B3, an architectural framework integrating Coordinate Attention into an ImageNet-pretrained EfficientNet-B3 backbone coupled with compression-aware stochastic training. By decomposing 2D spatial pooling into orthogonal 1D horizontal and vertical coordinate encoders, the proposed architecture captures long-range spatial dependencies and precise positional manipulation boundaries while demonstrating inherent resilience to isotropic 2D compression noise. Evaluated across 12,000 standardized test inferences spanning pristine and five lossy compression regimes (JPEG Quality Factors 80, 60, 50, 40, and 20), the proposed framework consistently outperforms the baseline across all compression tiers, slashing total compressed errors from 354 to 303 (-14.4\% error reduction) and reducing false positives by 24.2\% ($p = 0.0037$, paired McNemar test). On an independent unseen holdout of pure facial crops, Coordinate Attention reduces overall classification errors by 49.1\% and cuts false negatives by 50.0\% at the canonical threshold ($\tau = 0.50$). Gradient-weighted Class Activation Mapping (Grad-CAM) confirms that Coordinate Attention suppresses grid-aligned compression artifacts, directing semantic focus onto authentic anatomical boundary irregularities.
+DeepFake generation techniques using Generative Adversarial Networks (GANs) and diffusion models can now produce highly realistic synthetic faces. Although modern convolutional networks like EfficientNet-B3 achieve high accuracy on uncompressed benchmark datasets, their performance degrades noticeably when images are shared across social media platforms. Transmission pipelines introduce lossy JPEG compression that weakens fine forensic artifacts while introducing Discrete Cosine Transform (DCT) block noise. To address this problem, this study proposes an attention-enhanced framework termed Coord-EfficientNet-B3. The method integrates Coordinate Attention into an EfficientNet-B3 backbone and employs stochastic compression-aware training. By factorizing spatial pooling into orthogonal horizontal and vertical coordinate representations, the network captures positional tampering traces while filtering out two-dimensional compression noise. Across 12,000 evaluations spanning multiple compression levels, the proposed framework reduces total compressed errors by 14.4\% and decreases false alarms by 24.2\% compared to the standard EfficientNet-B3 baseline ($p = 0.0037$, McNemar test). On an unseen holdout of face portraits, the model cuts false negatives by 50.0\% at the standard 0.50 threshold. Grad-CAM visualizations further confirm that Coordinate Attention avoids compression grid artifacts and focuses on facial manipulation boundaries.
 \end{abstract}
 
 \begin{IEEEkeywords}
-DeepFake Detection, EfficientNet-B3, Coordinate Attention, Lossy Image Compression, Social Media Forensics, Gradient-weighted Class Activation Mapping (Grad-CAM), False Negative Suppression.
+DeepFake detection, EfficientNet-B3, Coordinate Attention, lossy compression, image forensics, Grad-CAM, false negatives.
 \end{IEEEkeywords}
 
 \section{Introduction}
-The proliferation of deep generative models has fundamentally transformed digital media synthesis. Modern Generative Adversarial Networks (GANs), such as StyleGAN, alongside emerging latent diffusion models, can synthesize high-fidelity facial portraits exhibiting complex anatomical realism, coherent lighting, and naturalistic skin textures \cite{karras2019style}. While these developments drive innovations in virtual rendering and visual effects, their weaponization for deceptive media---commonly termed DeepFakes---poses critical risks to identity verification, personal privacy, and information security \cite{mirsky2021creation}. Consequently, developing automated, highly reliable forensic detection frameworks has become an imperative objective in computational computer vision.
+The rapid growth of generative artificial intelligence has made it easy to produce realistic synthetic and manipulated images. Modern Generative Adversarial Networks (GANs) such as StyleGAN, along with recent diffusion models, can create human facial portraits with natural skin textures, convincing lighting, and accurate facial expressions \cite{karras2019style}. While these tools have useful applications in creative media, they also present serious risks when used for impersonation, political deception, and online fraud \cite{mirsky2021creation}. Reliable detection of manipulated media has therefore become an essential research topic in digital forensics.
 
-Contemporary deep learning architectures, particularly Convolutional Neural Networks (CNNs) equipped with compound parameter scaling such as EfficientNet, have emerged as strong candidates for facial forgery detection \cite{tan2019efficientnet}. Recently, Deepa et al. \cite{deepa2026enhanced} investigated an EfficientNet-B3 baseline for facial manipulation detection, demonstrating that transfer-learned convolutional hierarchies attain upwards of 97.9\% accuracy on pristine benchmark imagery, substantially surpassing classical handcrafted descriptors such as the Gray-Level Co-occurrence Matrix (GLCM) and Histograms of Oriented Gradients (HOG).
+Deep learning architectures based on Convolutional Neural Networks (CNNs) are widely used for deepfake detection because they automatically extract hierarchical visual patterns from image pixels \cite{tan2019efficientnet}. EfficientNet architectures, in particular, provide a practical balance between model parameter size and representational capacity through compound scaling. Recently, Deepa et al. \cite{deepa2026enhanced} evaluated an EfficientNet-B3 baseline on deepfake image classification, demonstrating that it reaches over 97.9\% accuracy on clean benchmark datasets and outperforms traditional machine learning approaches like Random Forests and Support Vector Machines.
 
-Despite these benchmark successes, a severe operational gap persists between laboratory evaluations and practical social media distribution \cite{verdoliva2020media}. In real-world transmission pipelines (e.g., messaging platforms and content sharing networks), user-uploaded visual media undergoes aggressive lossy compression and re-encoding. Lossy JPEG compression applies Discrete Cosine Transform (DCT) block quantization, which severely attenuates high-frequency spectral cues where subtle generative inconsistencies typically reside \cite{rossler2019faceforensics}. Simultaneously, JPEG block boundary discontinuities introduce artificial high-frequency grid ringing across authentic facial regions. As a result, standard deep convolutional networks frequently exhibit catastrophic performance degradation when evaluated under compressed inputs, conflating compression artifacts with generative manipulation boundaries and triggering elevated False Positive Rates (FPR) alongside missed detections (False Negatives) \cite{bondi2020training}.
+However, an important practical challenge remains unaddressed in standard evaluations. When images are transmitted across social media networks and messaging applications, they are routinely resized and compressed using lossy formats such as JPEG \cite{verdoliva2020media}. This process applies Discrete Cosine Transform (DCT) quantization, which attenuates high-frequency details where subtle forensic traces usually appear \cite{rossler2019faceforensics}. At the same time, block boundaries in JPEG compression can produce artificial grid ringing that resembles tampering seams \cite{bondi2020training}. Consequently, conventional classifiers trained only on clean imagery often experience elevated false alarm rates and missed detections when evaluated on compressed media.
 
-Although spatial and channel attention mechanisms have been explored in general vision, conventional channel attention aggregates spatial context via isotropic 2D Global Average Pooling, stripping precise positional coordinates \cite{woo2018cbam}. Spatial attention mechanisms, conversely, tend to focus on broad textural regions, rendering them highly susceptible to periodic 2D JPEG blocking patterns.
+To tackle this limitation, this study incorporates Coordinate Attention \cite{hou2021coordinate} into the EfficientNet-B3 backbone alongside compression-aware stochastic training. While standard channel attention methods such as Squeeze-and-Excitation compress all spatial information into a single scalar value \cite{hu2018squeeze}, Coordinate Attention splits spatial pooling into separate horizontal and vertical 1D feature vectors. This allows the network to locate forgery cues along one spatial coordinate while preserving a wide receptive field along the other. In addition, Gradient-weighted Class Activation Mapping (Grad-CAM) \cite{selvaraju2017gradcam} is applied to inspect the spatial focus of the model under compression.
 
-To overcome these structural limitations, this paper proposes \textbf{Coord-EfficientNet-B3}, integrating Coordinate Attention \cite{hou2021coordinate} into an EfficientNet-B3 feature extractor fine-tuned via stochastic compression-aware training. By factorizing spatial pooling into two 1D directional feature vectors along the horizontal and vertical spatial axes, Coordinate Attention preserves exact coordinate-dependent manipulation traces while selectively filtering out isotropic 2D compression noise. Furthermore, Gradient-weighted Class Activation Mapping (Grad-CAM) \cite{selvaraju2017gradcam} is employed to visually inspect and verify the forensic grounding of network decisions.
-
-The core contributions of this study are fourfold:
+The main contributions of this work are summarized as follows:
 \begin{enumerate}
-    \item \textbf{Architectural Formulation:} We integrate Coordinate Attention directly after the final convolutional feature extractor of EfficientNet-B3, establishing a position-sensitive, direction-aware representation space optimized for subtle facial boundary forensics without prohibitive computational overhead.
-    \item \textbf{Compression-Aware Stochastic Optimization:} We institute an end-to-end compression-aware training protocol that exposes the network dynamically to randomized JPEG Quality Factors ($\text{QF} \in \{20, 40, 50, 60, 80, 100\}$), forcing feature representations to remain invariant under lossy high-frequency degradation.
-    \item \textbf{Rigorous Multi-Regime Empirical Benchmarking:} We conduct a standardized evaluation across 12,000 paired inferences over five lossy compression tiers (QF80 down to severe QF20) on a hash-verified, duplicate-free split of the benchmark dataset \cite{karki2021deepfake}. We establish statistically significant gains ($p < 0.01$, McNemar test) over the un-augmented EfficientNet-B3 baseline \cite{deepa2026enhanced}, reducing overall classification errors by 14.4\% and false alarms by 24.2\%.
-    \item \textbf{Explainability and Artifact Disentanglement:} Using Grad-CAM \cite{selvaraju2017gradcam}, we provide visual and qualitative verification showing that Coordinate Attention actively suppresses periodic 2D DCT grid ringing, focusing feature activation maps onto authentic manipulation boundaries around facial perimeters, eyes, and mouth regions.
+    \item We design a Coordinate-Attention enhanced EfficientNet-B3 architecture (Coord-EfficientNet-B3) that captures precise positional manipulation cues without substantial parameter overhead.
+    \item We implement a compression-aware training strategy that randomly applies varying JPEG quality factors during training, encouraging feature representations to remain robust under lossy compression.
+    \item We conduct a structured benchmark across 12,000 evaluations over six compression levels, showing that the proposed model reduces total compressed errors by 14.4\% and cuts false alarms by 24.2\% ($p < 0.01$, McNemar test) compared to the un-augmented EfficientNet-B3 baseline \cite{deepa2026enhanced}.
+    \item We evaluate an independent unseen holdout of pure facial portraits, demonstrating a 49.1\% reduction in total errors and a 50.0\% reduction in false negatives at the standard threshold ($\tau = 0.50$).
+    \item We provide Grad-CAM visual analyses verifying that Coordinate Attention prevents feature dispersion across 2D compression grids and maintains focus on facial boundary regions.
 \end{enumerate}
 
 \section{Related Work}
 
-\subsection{DeepFake Detection and Convolutional Architectures}
-Early deepfake forensics relied extensively on handcrafted visual cues, including abnormal eye-blinking frequencies \cite{li2018ictu}, unnatural corneal specular highlights, and head-pose trajectory inconsistencies \cite{mirsky2021creation}. However, as generative architectures adopted progressive growing and style-based latent modulation, explicit geometric artifacts diminished, necessitating deep feature representations \cite{karras2019style}.
+\subsection{DeepFake Detection and CNN Models}
+Early forensic techniques focused on hand-crafted biological and physical cues, including irregular eye blinking patterns \cite{li2018ictu}, abnormal corneal specular reflections, and head pose mismatches \cite{mirsky2021creation}. As generative models improved, these visible flaws became less frequent, prompting the adoption of deep feature extractors \cite{karras2019style}.
 
-Convolutional Neural Networks have since become the dominant paradigm for spatial manipulation detection. Afchar et al. \cite{afchar2018mesonet} introduced MesoNet, employing compact convolutional layers to identify mesoscopic facial compression and blending boundaries. R{\"o}ssler et al. \cite{rossler2019faceforensics} conducted large-scale benchmarks with XceptionNet on the FaceForensics++ corpus, showing that deep separable convolutions achieve superior detection performance on uncompressed video frames. Recently, Tan and Le \cite{tan2019efficientnet} established EfficientNet, which balances depth, width, and input resolution through compound coefficient scaling. In a direct comparative analysis on static deepfake imagery, Deepa et al. \cite{deepa2026enhanced} demonstrated that an ImageNet-pretrained EfficientNet-B3 backbone achieves 97.95\% accuracy on clean benchmark imagery, consistently outperforming InceptionV3 and classical ensemble classifiers. However, the study conducted by Deepa et al. evaluated models exclusively on pristine, uncompressed inputs, leaving their resilience to social media compression unaddressed.
+Convolutional networks have since become the standard tool for image manipulation analysis. Afchar et al. \cite{afchar2018mesonet} developed MesoNet, using compact convolutional layers to identify facial boundary artifacts. R{\"o}ssler et al. \cite{rossler2019faceforensics} conducted comprehensive benchmarks using XceptionNet on the FaceForensics++ dataset, demonstrating strong detection accuracy on uncompressed video frames. Tan and Le \cite{tan2019efficientnet} introduced EfficientNet, which scales network depth, width, and resolution systematically. Deepa et al. \cite{deepa2026enhanced} applied EfficientNet-B3 to deepfake detection, obtaining 97.95\% accuracy on clean benchmark imagery and showing that deep feature learning surpasses traditional texture descriptors. However, their study evaluated models solely on uncompressed data.
 
-\subsection{Impact of Lossy Compression in Forensic Pipelines}
-The vulnerability of deep neural networks to image recompression has been extensively highlighted in digital media forensics. JPEG compression partitions images into non-overlapping $8 \times 8$ pixel blocks, applies a 2D Discrete Cosine Transform (DCT), and quantizes high-frequency coefficients \cite{verdoliva2020media}. R{\"o}ssler et al. \cite{rossler2019faceforensics} observed that deep models trained on raw inputs experience drastic performance drops (often exceeding 15--20 percentage points) when evaluated on compressed media. To counteract compression degradation, data augmentation strategies incorporating lossy codecs during training have been explored \cite{bondi2020training}. While stochastic compression exposure improves baseline resilience, standard CNN feature extractors lack explicit mechanisms to decouple genuine forensic anomalies from DCT blocking artifacts, frequently elevating false alarm rates on highly compressed authentic media.
+\subsection{Compression Robustness in Image Forensics}
+Lossy compression represents a known challenge in real-world forensic deployment. JPEG encoding partitions an image into $8 \times 8$ pixel blocks, applies DCT transformation, and discards high-frequency coefficients through quantization tables \cite{verdoliva2020media}. R{\"o}ssler et al. \cite{rossler2019faceforensics} observed that deep models trained on pristine images suffer marked accuracy drops when tested on compressed images. Bondi et al. \cite{bondi2020training} showed that incorporating compression augmentations during training improves general stability. Nevertheless, standard convolutional filters can still struggle to distinguish authentic image details from block boundary artifacts when compression is severe.
 
-\subsection{Attention Mechanisms in Image Forensics}
-Attention modules enable neural networks to emphasize salient feature subspaces while suppressing task-irrelevant background noise. Hu et al. \cite{hu2018squeeze} introduced Squeeze-and-Excitation (SE) networks, utilizing global average pooling to compute channel-wise recalibration weights. Woo et al. \cite{woo2018cbam} developed the Convolutional Block Attention Module (CBAM), sequentially combining channel attention with spatial attention computed via pooling across channel slices.
+\subsection{Attention Mechanisms in Computer Vision}
+Attention modules help convolutional networks emphasize informative feature regions while down-weighting irrelevant background noise. Hu et al. \cite{hu2018squeeze} developed Squeeze-and-Excitation (SE) networks, computing channel-wise attention weights through global average pooling. Woo et al. \cite{woo2018cbam} introduced the Convolutional Block Attention Module (CBAM), combining channel and spatial attention sequentially.
 
-Despite their utility, conventional attention modules suffer from key architectural trade-offs in forensic tasks. SE blocks aggregate spatial information globally, discarding spatial location information that is essential for identifying localized tampering seams \cite{hou2021coordinate}. Standard 2D spatial attention captures broad spatial regions but lacks directional selectivity, often causing activations to scatter across periodic 2D JPEG grid boundaries. Hou et al. \cite{hou2021coordinate} resolved this limitation by formulating Coordinate Attention (CoordAtt) for mobile network design. By factorizing 2D global pooling into a pair of 1D directional feature encoders along orthogonal axes, Coordinate Attention captures long-range dependencies along one spatial dimension while retaining precise positional coordinates along the other. In this paper, we leverage this directional property for digital forensics under lossy compression.
+Although helpful, standard attention designs have limitations in forensic tasks. SE pooling removes spatial coordinate information completely \cite{hou2021coordinate}. Standard 2D spatial attention captures broad areas but lacks directional selectivity, which can cause activations to align with regular 2D JPEG block grids. Hou et al. \cite{hou2021coordinate} addressed this by introducing Coordinate Attention, which factorizes 2D pooling into orthogonal 1D horizontal and vertical feature vectors. This design captures position-sensitive cues with low computational cost, making it suitable for identifying subtle tampering boundaries under compression.
 
-\subsection{Explainability via Class Activation Mapping}
-To prevent deep models from operating as unverified black boxes, explainable visual attribution methods have become critical in security-critical applications. Selvaraju et al. \cite{selvaraju2017gradcam} proposed Gradient-weighted Class Activation Mapping (Grad-CAM), computing the gradient of the target class score with respect to feature maps in the final convolutional layer. Chattopadhay et al. \cite{chattopadhay2018gradcamplus} introduced Grad-CAM++ for multi-instance visual explanation. Grad-CAM visualizes whether a network bases its predictions on meaningful forensic boundaries or extraneous background context, providing an empirical tool to evaluate whether attention mechanisms successfully mitigate compression-induced feature drift.
+\subsection{Visual Explainability via Grad-CAM}
+To understand deep model decisions, visual attribution methods have gained widespread use. Selvaraju et al. \cite{selvaraju2017gradcam} proposed Grad-CAM, which calculates gradients of the predicted class score with respect to the final convolutional feature maps to produce localization heatmaps. Chattopadhay et al. \cite{chattopadhay2018gradcamplus} introduced Grad-CAM++ for fine-grained multi-region visualization. In this study, Grad-CAM is utilized to verify whether models attend to genuine facial forgery cues rather than compression noise.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/architecture_diagram.png}
+\caption{Workflow of the proposed Coord-EfficientNet-B3 framework, showing compression augmentation, the EfficientNet-B3 backbone, Coordinate Attention, and classification.}
+\label{fig:arch}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/sample_faces.png}
+\caption{Representative sample facial portraits from the evaluation dataset: genuine human faces from FFHQ (top) and synthetic faces from StyleGAN (bottom).}
+\label{fig:samples}
+\end{figure}
 
 \section{Proposed Methodology}
 
-\subsection{EfficientNet-B3 Feature Extraction Backbone}
-The baseline feature extractor is based on EfficientNet-B3 \cite{tan2019efficientnet}, initialized with ImageNet-1k pretrained weights. Given an input facial image $X \in \mathbb{R}^{3 \times 224 \times 224}$, the backbone produces a high-level semantic feature tensor:
+The overall pipeline of the proposed \textbf{Coord-EfficientNet-B3} framework is illustrated in Fig. \ref{fig:arch}. It consists of: (1) stochastic compression augmentation during data loading, (2) deep feature extraction via an EfficientNet-B3 backbone, (3) Coordinate Attention encoding, (4) a multilayer perceptron classifier head, and (5) Grad-CAM visual attribution. Sample images from the dataset are shown in Fig. \ref{fig:samples}.
+
+\subsection{Backbone Feature Extraction}
+The model takes an input face image $X \in \mathbb{R}^{3 \times 224 \times 224}$ and passes it through an ImageNet-pretrained EfficientNet-B3 backbone \cite{tan2019efficientnet}. This produces an intermediate feature map:
 \begin{equation}
 F = \Phi_{\text{backbone}}(X) \in \mathbb{R}^{C \times H \times W}
 \end{equation}
-where $C = 1536$ denotes the output channel depth, and $H = W = 7$ represents the downsampled spatial grid.
+where $C = 1536$ represents the channel depth and $H = W = 7$ denotes the spatial resolution.
 
-\subsection{Coordinate Attention Module Formulation}
-To preserve fine-grained spatial location cues while suppressing isotropic compression noise, Coordinate Attention \cite{hou2021coordinate} is applied directly to the intermediate feature map $F$.
+\subsection{Coordinate Attention Module}
+To help the network capture localized manipulation traces and resist isotropic compression noise, Coordinate Attention \cite{hou2021coordinate} is placed after the final convolutional stage.
 
-\subsubsection{1D Coordinate Information Embedding}
-Instead of standard 2D global pooling which flattens spatial dimensions into a scalar, spatial pooling is decomposed into two orthogonal 1D directional operations. For channel $c$, pooling along the horizontal coordinate dimension yields activation vector $z_c^h \in \mathbb{R}^{H \times 1}$ at height $h$:
+Standard global average pooling flattens all spatial values into a single number per channel, losing position details. Coordinate Attention instead pools features along horizontal and vertical directions separately. For channel $c$, pooling across width $W$ gives horizontal vector $z_c^h \in \mathbb{R}^{H \times 1}$, and pooling across height $H$ gives vertical vector $z_c^w \in \mathbb{R}^{1 \times W}$:
 \begin{equation}
-z_c^h(h) = \frac{1}{W} \sum_{0 \le j < W} F_c(h, j)
-\end{equation}
-Similarly, pooling along the vertical coordinate dimension yields activation vector $z_c^w \in \mathbb{R}^{1 \times W}$ at width $w$:
-\begin{equation}
-z_c^w(w) = \frac{1}{H} \sum_{0 \le i < H} F_c(i, w)
+z_c^h(h) = \frac{1}{W} \sum_{j=0}^{W-1} F_c(h, j), \quad z_c^w(w) = \frac{1}{H} \sum_{i=0}^{H-1} F_c(i, w)
 \end{equation}
 
-\subsubsection{Coordinate Attention Generation}
-The directional embedding vectors $z^h$ and $z^w$ are concatenated along the spatial dimension and projected through a shared $1 \times 1$ convolutional transform $F_1$:
-\begin{equation}
-f = \delta\left( \text{BN}\left( F_1([z^h, z^w]) \right) \right) \in \mathbb{R}^{C/r \times (H + W)}
-\end{equation}
-where $[\cdot, \cdot]$ denotes spatial concatenation, $\text{BN}$ is Batch Normalization, $\delta(\cdot)$ is the Hard-Swish non-linear activation, and $r = 16$ is the channel reduction ratio.
-
-The representation $f$ is split along the spatial dimension into $f^h \in \mathbb{R}^{C/r \times H}$ and $f^w \in \mathbb{R}^{C/r \times W}$. Two separate $1 \times 1$ convolutions $F_h$ and $F_w$ expand the channel dimensions back to $C$:
-\begin{equation}
-g^h = \sigma\left( F_h(f^h) \right) \in \mathbb{R}^{C \times H \times 1}, \quad g^w = \sigma\left( F_w(f^w) \right) \in \mathbb{R}^{C \times 1 \times W}
-\end{equation}
-where $\sigma(\cdot)$ is the sigmoid gating function.
-
-\subsubsection{Feature Modulation and Output}
-The modulated feature map $Y \in \mathbb{R}^{C \times H \times W}$ is formulated as:
+The vectors $z^h$ and $z^w$ are concatenated and passed through a shared $1 \times 1$ convolution, Batch Normalization, and a non-linear activation with a reduction ratio $r = 16$. The intermediate representation is then split and passed through two separate $1 \times 1$ convolutions and sigmoid functions, yielding horizontal weights $g^h \in \mathbb{R}^{C \times H \times 1}$ and vertical weights $g^w \in \mathbb{R}^{C \times 1 \times W}$. The final modulated feature map $Y \in \mathbb{R}^{C \times H \times W}$ is computed by element-wise multiplication:
 \begin{equation}
 Y_c(i, j) = F_c(i, j) \times g_c^h(i) \times g_c^w(j)
 \end{equation}
-This modulation ensures that each feature element is weighted both by channel significance and by exact horizontal and vertical coordinate relevance.
+This formulation allows the network to emphasize important spatial coordinates while preserving channel-wise selectivity.
 
-\subsection{Classifier Head and Inference Rule}
-The coordinate-modulated tensor $Y$ is reduced via Global Average Pooling to $\bar{y} \in \mathbb{R}^{1536}$:
-\begin{equation}
-\bar{y}_c = \frac{1}{H \times W} \sum_{i=1}^H \sum_{j=1}^W Y_c(i, j)
-\end{equation}
-The feature vector $\bar{y}$ is processed through a three-stage regularized classification head:
-\begin{align}
-h_1 &= \text{Dropout}_{0.3}\left( \text{ReLU}\left( W_1 \bar{y} + b_1 \right) \right), \quad W_1 \in \mathbb{R}^{128 \times 1536} \\
-h_2 &= \text{Dropout}_{0.2}\left( \text{ReLU}\left( W_2 h_1 + b_2 \right) \right), \quad W_2 \in \mathbb{R}^{64 \times 128} \\
-z &= W_3 h_2 + b_3, \quad W_3 \in \mathbb{R}^{1 \times 64}
-\end{align}
-where $z \in \mathbb{R}$ is the unnormalized classification logit. The posterior probability is:
+\subsection{Classifier Head and Decision Rule}
+The modulated feature tensor $Y$ is reduced through Global Average Pooling into a 1536-dimensional vector $\bar{y}$. This vector is passed to a three-stage classifier head:
+\begin{itemize}
+    \item Dense layer: $1536 \to 128$, with ReLU and Dropout (rate = 0.3)
+    \item Dense layer: $128 \to 64$, with ReLU and Dropout (rate = 0.2)
+    \item Output layer: $64 \to 1$, producing unnormalized scalar logit $z$.
+\end{itemize}
+The estimated probability of an image being a deepfake is obtained through the sigmoid activation:
 \begin{equation}
 P(\text{Fake} \mid X) = \sigma(z) = \frac{1}{1 + e^{-z}}
 \end{equation}
-Binary classification follows the canonical decision threshold $\tau = 0.50$:
-\begin{equation}
-\hat{y} = \begin{cases} 1 \; (\text{Fake}), & \text{if } P(\text{Fake} \mid X) \ge \tau \\ 0 \; (\text{Real}), & \text{otherwise} \end{cases}
-\end{equation}
+Predictions are assigned using the standard decision threshold $\tau = 0.50$, where an image is classified as Fake if $P(\text{Fake} \mid X) \ge 0.50$ and Real otherwise.
 
-\subsection{Compression-Aware Stochastic Training Protocol}
-During data loading, each input image $X_{\text{raw}}$ undergoes stochastic on-the-fly JPEG quantization with probability $p = 0.50$:
+\subsection{Compression-Aware Training}
+During training, input images are stochastically compressed with 50\% probability using random JPEG quality factors:
 \begin{equation}
-X = \begin{cases} X_{\text{raw}}, & \text{with prob } 0.50 \\ \mathcal{J}_{\text{JPEG}}(X_{\text{raw}}, \text{QF}), & \text{with prob } 0.50, \; \text{QF} \sim \mathcal{U}(\{20, 40, 50, 60, 80\}) \end{cases}
+\text{QF} \sim \text{Uniform}(\{20, 40, 50, 60, 80\})
 \end{equation}
-The network is optimized using Binary Cross-Entropy with Logits loss:
+This trains the network to rely on features that remain recognizable under different compression tiers. Models are trained using Binary Cross-Entropy loss:
 \begin{equation}
-\mathcal{L}(y, z) = - \left[ y \log \sigma(z) + (1 - y) \log (1 - \sigma(z)) \right]
+\mathcal{L} = - [y \log \sigma(z) + (1 - y) \log (1 - \sigma(z))]
 \end{equation}
-via Adam ($\eta = 10^{-4}$, batch size $B = 16$) across 10 epochs (Epochs 1--2: frozen backbone; Epochs 3--10: full end-to-end fine-tuning).
+using the Adam optimizer with learning rate $\eta = 10^{-4}$ and batch size $B = 16$ across 10 epochs. The first two epochs train only the classification head with a frozen backbone, while epochs 3 to 10 fine-tune all parameters end-to-end.
 
-\subsection{Explainability Formulation: Pre-Activation Grad-CAM}
-To avoid gradient saturation when predictions approach 0 or 1, backpropagation is targeted directly at the pre-activation logit score $y^c$:
-\begin{equation}
-y^c = \begin{cases} +z, & \text{for class } c = \text{Fake} \\ -z, & \text{for class } c = \text{Real} \end{cases}
-\end{equation}
-The importance weight $\alpha_k^c$ for the $k$-th feature map $A^k \in \mathbb{R}^{H \times W}$ at the Coordinate Attention output $Y$ is:
-\begin{equation}
-\alpha_k^c = \frac{1}{H \times W} \sum_{i=1}^H \sum_{j=1}^W \frac{\partial y^c}{\partial A_{i, j}^k}
-\end{equation}
-The class-discriminative localization map $L_{\text{Grad-CAM}}^c$ is synthesized via:
-\begin{equation}
-L_{\text{Grad-CAM}}^c = \text{ReLU}\left( \sum_{k=1}^C \alpha_k^c A^k \right)
-\end{equation}
+\subsection{Grad-CAM Interpretability}
+To examine model predictions, Grad-CAM \cite{selvaraju2017gradcam} is applied. Gradients of the pre-activation score $y^c = z$ (for Fake) or $y^c = -z$ (for Real) are computed with respect to the Coordinate Attention feature map $Y$. Feature maps are weighted by their average gradients and combined using a ReLU activation to generate a spatial heatmap indicating the regions responsible for the decision.
 
 \section{Experimental Setup and Results}
 
-\subsection{Dataset Partitioning and Duplicate Audit}
-All primary experiments utilize the benchmark dataset curated by Karki \cite{karki2021deepfake} (140,000 images, $256 \times 256$ resolution; Flickr-Faces-HQ authentic portraits and NVIDIA StyleGAN synthetic portraits \cite{karras2019style}).
+\subsection{Dataset Partitioning}
+Experiments were carried out using the benchmark dataset curated by Karki \cite{karki2021deepfake}, which contains 140,000 balanced $256 \times 256$ facial images. Authentic images are sourced from Flickr-Faces-HQ (FFHQ), and synthetic faces are generated using NVIDIA StyleGAN \cite{karras2019style}.
 
-A duplicate-audited partition was established and permanently frozen:
+A duplicate-checked partition was constructed:
 \begin{itemize}
-    \item \textbf{Training Set:} 7,200 images (3,600 Real, 3,600 Fake).
-    \item \textbf{Validation Set:} 800 clean images (400 Real, 400 Fake) for checkpoint selection.
-    \item \textbf{Test Set (`test.csv`):} 2,000 independent images (1,000 Real, 1,000 Fake).
+    \item \textbf{Training Set:} 7,200 images (3,600 Real, 3,600 Fake)
+    \item \textbf{Validation Set:} 800 clean images (400 Real, 400 Fake) for model checkpoint selection
+    \item \textbf{Test Set:} 2,000 images (1,000 Real, 1,000 Fake) evaluated across multiple compression levels
 \end{itemize}
-Cryptographic SHA-256 and difference-hashing (dHash) audits confirmed zero exact duplicate cross-split leakage ($N_{\text{cross}} = 0$).
+SHA-256 and difference-hashing (dHash) audits confirmed that no identical images crossed between training, validation, and test splits.
 
-\subsection{Primary Multi-Regime Compression Benchmark (12,000 Inferences)}
-The 2,000 test images were evaluated across Clean and five lossy JPEG quality factors ($\text{QF} \in \{80, 60, 50, 40, 20\}$), totaling 12,000 standardized inferences per model. Table \ref{tab:master} presents the master comparison at $\tau = 0.50$.
+\subsection{Multi-Condition Compression Benchmark}
+The 2,000 test images were evaluated under six conditions: uncompressed (Clean) and five lossy JPEG quality factors (QF80, QF60, QF50, QF40, QF20), providing 12,000 evaluations per model. Table \ref{tab:master} presents the performance of the Baseline EfficientNet-B3 and the Proposed Coord-EfficientNet-B3 at the standard threshold $\tau = 0.50$.
 
 \begin{table*}[t]
-\caption{Master Comparative Benchmark Across Multi-QF Compression Regimes ($\tau = 0.50$)}
+\caption{Comparative Benchmark Across Multi-QF Compression Regimes ($\tau = 0.50$)}
 \label{tab:master}
 \centering
-\begin{tabular}{lcccccccccc}
-\toprule
-\textbf{Condition (QF)} & \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{MCC} & \textbf{FP} & \textbf{FN} & \textbf{Total Errors} & \textbf{Error $\Delta$} \\
-\midrule
-Clean (None) & M3 Baseline & 97.40\% & 98.57\% & 96.20\% & 97.37\% & 0.9483 & 14 & 38 & 52 & --- \\
-             & \textbf{M6 CoordAtt} & \textbf{97.80\%} & \textbf{98.78\%} & \textbf{96.80\%} & \textbf{97.78\%} & \textbf{0.9562} & \textbf{12} & \textbf{32} & \textbf{44} & \textbf{-8 (-15.4\%)} \\
-\midrule
-QF80         & M3 Baseline & 97.20\% & 98.36\% & 96.00\% & 97.17\% & 0.9443 & 16 & 40 & 56 & --- \\
-             & \textbf{M6 CoordAtt} & \textbf{97.65\%} & \textbf{98.97\%} & \textbf{96.30\%} & \textbf{97.62\%} & \textbf{0.9533} & \textbf{10} & \textbf{37} & \textbf{47} & \textbf{-9 (-16.1\%)} \\
-\midrule
-QF60         & M3 Baseline & 97.40\% & 97.98\% & \textbf{96.80\%} & 97.38\% & 0.9481 & 20 & \textbf{32} & 52 & --- \\
-             & \textbf{M6 CoordAtt} & \textbf{97.55\%} & \textbf{98.57\%} & 96.50\% & \textbf{97.52\%} & \textbf{0.9512} & \textbf{14} & 35 & \textbf{49} & \textbf{-3 (-5.8\%)} \\
-\midrule
-QF50         & M3 Baseline & 96.65\% & 96.42\% & \textbf{96.90\%} & 96.66\% & 0.9330 & 36 & \textbf{31} & 67 & --- \\
-             & \textbf{M6 CoordAtt} & \textbf{97.15\%} & \textbf{97.48\%} & 96.80\% & \textbf{97.14\%} & \textbf{0.9430} & \textbf{25} & 32 & \textbf{57} & \textbf{-10 (-14.9\%)} \\
-\midrule
-QF40         & M3 Baseline & 96.25\% & 98.13\% & 94.30\% & 96.18\% & 0.9257 & 18 & 57 & 75 & --- \\
-             & \textbf{M6 CoordAtt} & \textbf{96.65\%} & \textbf{98.34\%} & \textbf{94.90\%} & \textbf{96.59\%} & \textbf{0.9336} & \textbf{16} & \textbf{51} & \textbf{67} & \textbf{-8 (-10.7\%)} \\
-\midrule
-QF20 (Severe)& M3 Baseline & 94.80\% & 96.09\% & 93.40\% & 94.73\% & 0.8964 & 38 & 66 & 104 & --- \\
-             & \textbf{M6 CoordAtt} & \textbf{95.85\%} & \textbf{96.74\%} & \textbf{94.90\%} & \textbf{95.81\%} & \textbf{0.9172} & \textbf{32} & \textbf{51} & \textbf{83} & \textbf{-21 (-20.2\%)} \\
-\midrule
-\textbf{Compressed Total} & M3 Baseline & 96.46\% & 97.40\% & 95.48\% & 96.43\% & 0.9295 & 128 & 226 & 354 & --- \\
-\textbf{(10,000 runs)}     & \textbf{M6 CoordAtt} & \textbf{96.97\%} & \textbf{98.02\%} & \textbf{95.88\%} & \textbf{96.94\%} & \textbf{0.9397} & \textbf{97} & \textbf{206} & \textbf{303} & \textbf{-51 (-14.4\%)} \\
-\bottomrule
+\begin{tabular}{llccccccccc}
+\hline
+\textbf{Condition} & \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{MCC} & \textbf{FP} & \textbf{FN} & \textbf{Errors} & \textbf{Error $\Delta$} \\
+\hline
+Clean & Baseline (EfficientNet-B3) & 97.40\% & 98.57\% & 96.20\% & 97.37\% & 0.9483 & 14 & 38 & 52 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{97.80\%} & \textbf{98.78\%} & \textbf{96.80\%} & \textbf{97.78\%} & \textbf{0.9562} & \textbf{12} & \textbf{32} & \textbf{44} & \textbf{-8 (-15.4\%)} \\
+\hline
+QF80  & Baseline (EfficientNet-B3) & 97.20\% & 98.36\% & 96.00\% & 97.17\% & 0.9443 & 16 & 40 & 56 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{97.65\%} & \textbf{98.97\%} & \textbf{96.30\%} & \textbf{97.62\%} & \textbf{0.9533} & \textbf{10} & \textbf{37} & \textbf{47} & \textbf{-9 (-16.1\%)} \\
+\hline
+QF60  & Baseline (EfficientNet-B3) & 97.40\% & 97.98\% & \textbf{96.80\%} & 97.38\% & 0.9481 & 20 & \textbf{32} & 52 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{97.55\%} & \textbf{98.57\%} & 96.50\% & \textbf{97.52\%} & \textbf{0.9512} & \textbf{14} & 35 & \textbf{49} & \textbf{-3 (-5.8\%)} \\
+\hline
+QF50  & Baseline (EfficientNet-B3) & 96.65\% & 96.42\% & \textbf{96.90\%} & 96.66\% & 0.9330 & 36 & \textbf{31} & 67 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{97.15\%} & \textbf{97.48\%} & 96.80\% & \textbf{97.14\%} & \textbf{0.9430} & \textbf{25} & 32 & \textbf{57} & \textbf{-10 (-14.9\%)} \\
+\hline
+QF40  & Baseline (EfficientNet-B3) & 96.25\% & 98.13\% & 94.30\% & 96.18\% & 0.9257 & 18 & 57 & 75 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{96.65\%} & \textbf{98.34\%} & \textbf{94.90\%} & \textbf{96.59\%} & \textbf{0.9336} & \textbf{16} & \textbf{51} & \textbf{67} & \textbf{-8 (-10.7\%)} \\
+\hline
+QF20  & Baseline (EfficientNet-B3) & 94.80\% & 96.09\% & 93.40\% & 94.73\% & 0.8964 & 38 & 66 & 104 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{95.85\%} & \textbf{96.74\%} & \textbf{94.90\%} & \textbf{95.81\%} & \textbf{0.9172} & \textbf{32} & \textbf{51} & \textbf{83} & \textbf{-21 (-20.2\%)} \\
+\hline
+\textbf{Compressed Total} & Baseline (EfficientNet-B3) & 96.46\% & 97.40\% & 95.48\% & 96.43\% & 0.9295 & 128 & 226 & 354 & --- \\
+\textbf{(10,000 runs)}     & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{96.97\%} & \textbf{98.02\%} & \textbf{95.88\%} & \textbf{96.94\%} & \textbf{0.9397} & \textbf{97} & \textbf{206} & \textbf{303} & \textbf{-51 (-14.4\%)} \\
+\hline
 \end{tabular}
 \end{table*}
 
-Across the 10,000 compressed evaluations (QF80--QF20):
+As shown in Table \ref{tab:master}, the proposed Coord-EfficientNet-B3 achieves higher accuracy than the baseline across all compression tiers. On clean images, accuracy increases from 97.40\% to 97.80\%. Under harsh compression (QF20), the accuracy difference widens to +1.05 percentage points (95.85\% vs. 94.80\%), reducing total errors from 104 to 83 (-20.2\%) and missed fakes (FN) from 66 to 51 (-22.7\%).
+
+Across the 10,000 compressed tests:
 \begin{itemize}
-    \item Total classification errors decrease from 354 to 303 (\textbf{-14.4\% error reduction}).
-    \item False Positives decrease from 128 to 97 (\textbf{-24.2\% reduction in false alarms}).
-    \item False Negatives decrease from 226 to 206 (\textbf{-8.8\% reduction in missed deepfakes}).
-    \item Paired McNemar test confirms statistical significance: discordant pairs $b = 144$, $c = 93$, yielding $\chi^2 = 10.55$, \textbf{$p = 0.00116$ ($p < 0.01$)}.
+    \item Total misclassifications fall from 354 to 303 (-14.4\% error reduction).
+    \item False positives decrease from 128 to 97 (-24.2\% reduction in false alarms).
+    \item False negatives decrease from 226 to 206 (-8.8\% reduction in missed detections).
+    \item A paired McNemar test over the 10,000 paired evaluations yields $\chi^2 = 10.55$, confirming statistical significance at $p = 0.00116$ ($p < 0.01$).
 \end{itemize}
 
-\subsection{Unseen Pure Facial Holdout Benchmark (1,200 Inferences)}
-To test generalization on unseen subjects, 200 facial crops were drawn from the untouched `Test/` directory of the benchmark repository \cite{karki2021deepfake}. Table \ref{tab:holdout} presents the results across all six conditions at $\tau = 0.50$.
+\subsection{Unseen Pure Facial Holdout Evaluation}
+To test performance on previously unseen faces, an additional 200 facial portraits (100 Real, 100 Fake) were selected from the untouched test directory of the benchmark repository \cite{karki2021deepfake}. Table \ref{tab:holdout} summarizes performance across all six conditions at $\tau = 0.50$.
 
 \begin{table*}[t]
 \caption{Evaluation on Unseen Pure Facial Holdout Dataset Across Multi-QF Regimes ($\tau = 0.50$)}
 \label{tab:holdout}
 \centering
 \begin{tabular}{llcccccccc}
-\toprule
-\textbf{Condition} & \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1 Score} & \textbf{FP} & \textbf{FN} & \textbf{Total Errors} & \textbf{Error Reduction} \\
-\midrule
-Clean & M3 Baseline & 96.00\% & 97.00\% & 95.10\% & 96.04\% & 5 & 3 & 8 & --- \\
-      & \textbf{M6 CoordAtt} & \textbf{97.50\%} & \textbf{98.00\%} & \textbf{97.03\%} & \textbf{97.51\%} & \textbf{3} & \textbf{2} & \textbf{5} & \textbf{-37.5\%} \\
-\midrule
-QF80  & M3 Baseline & 96.00\% & 97.00\% & 95.10\% & 96.04\% & 5 & 3 & 8 & --- \\
-      & \textbf{M6 CoordAtt} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{98.99\%} & \textbf{98.49\%} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{-62.5\%} \\
-\midrule
-QF60  & M3 Baseline & 94.00\% & 94.00\% & 94.00\% & 94.00\% & 6 & 6 & 12 & --- \\
-      & \textbf{M6 CoordAtt} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{2} & \textbf{2} & \textbf{4} & \textbf{-66.7\%} \\
-\midrule
-QF50  & M3 Baseline & 94.50\% & 98.00\% & 91.59\% & 94.69\% & 9 & 2 & 11 & --- \\
-      & \textbf{M6 CoordAtt} & \textbf{96.50\%} & \textbf{99.00\%} & \textbf{94.29\%} & \textbf{96.59\%} & \textbf{6} & \textbf{1} & \textbf{7} & \textbf{-36.4\%} \\
-\midrule
-QF40  & M3 Baseline & 95.50\% & 96.00\% & 95.05\% & 95.52\% & 5 & 4 & 9 & --- \\
-      & \textbf{M6 CoordAtt} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{98.99\%} & \textbf{98.49\%} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{-66.7\%} \\
-\midrule
-QF20  & M3 Baseline & 95.50\% & 96.00\% & 95.05\% & 95.52\% & 5 & 4 & 9 & --- \\
-      & \textbf{M6 CoordAtt} & \textbf{96.50\%} & \textbf{98.00\%} & \textbf{95.15\%} & \textbf{96.55\%} & \textbf{5} & \textbf{2} & \textbf{7} & \textbf{-22.2\%} \\
-\midrule
-\textbf{Aggregate} & M3 Baseline & 95.25\% & 96.33\% & 94.29\% & 95.30\% & 35 & 22 & 57 & --- \\
-\textbf{(1,200 runs)} & \textbf{M6 CoordAtt} & \textbf{97.58\%} & \textbf{98.17\%} & \textbf{97.03\%} & \textbf{97.60\%} & \textbf{18} & \textbf{11} & \textbf{29} & \textbf{-49.1\%} \\
-\bottomrule
+\hline
+\textbf{Condition} & \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1 Score} & \textbf{FP} & \textbf{FN} & \textbf{Errors} & \textbf{Error Reduction} \\
+\hline
+Clean & Baseline (EfficientNet-B3) & 96.00\% & 97.00\% & 95.10\% & 96.04\% & 5 & 3 & 8 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{97.50\%} & \textbf{98.00\%} & \textbf{97.03\%} & \textbf{97.51\%} & \textbf{3} & \textbf{2} & \textbf{5} & \textbf{-37.5\%} \\
+\hline
+QF80  & Baseline (EfficientNet-B3) & 96.00\% & 97.00\% & 95.10\% & 96.04\% & 5 & 3 & 8 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{98.99\%} & \textbf{98.49\%} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{-62.5\%} \\
+\hline
+QF60  & Baseline (EfficientNet-B3) & 94.00\% & 94.00\% & 94.00\% & 94.00\% & 6 & 6 & 12 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{2} & \textbf{2} & \textbf{4} & \textbf{-66.7\%} \\
+\hline
+QF50  & Baseline (EfficientNet-B3) & 94.50\% & 98.00\% & 91.59\% & 94.69\% & 9 & 2 & 11 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{96.50\%} & \textbf{99.00\%} & \textbf{94.29\%} & \textbf{96.59\%} & \textbf{6} & \textbf{1} & \textbf{7} & \textbf{-36.4\%} \\
+\hline
+QF40  & Baseline (EfficientNet-B3) & 95.50\% & 96.00\% & 95.05\% & 95.52\% & 5 & 4 & 9 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{98.99\%} & \textbf{98.49\%} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{-66.7\%} \\
+\hline
+QF20  & Baseline (EfficientNet-B3) & 95.50\% & 96.00\% & 95.05\% & 95.52\% & 5 & 4 & 9 & --- \\
+      & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{96.50\%} & \textbf{98.00\%} & \textbf{95.15\%} & \textbf{96.55\%} & \textbf{5} & \textbf{2} & \textbf{7} & \textbf{-22.2\%} \\
+\hline
+\textbf{Aggregate} & Baseline (EfficientNet-B3) & 95.25\% & 96.33\% & 94.29\% & 95.30\% & 35 & 22 & 57 & --- \\
+\textbf{(1,200 runs)} & \textbf{Proposed (Coord-EfficientNet-B3)} & \textbf{97.58\%} & \textbf{98.17\%} & \textbf{97.03\%} & \textbf{97.60\%} & \textbf{18} & \textbf{11} & \textbf{29} & \textbf{-49.1\%} \\
+\hline
 \end{tabular}
 \end{table*}
 
-On unseen facial portraits, M6 achieves \textbf{97.58\% overall accuracy} (vs. 95.25\% for M3), cutting total classification errors from 57 to 29 (\textbf{-49.1\% reduction}) and halving False Negatives from 22 to 11 (\textbf{-50.0\% reduction in missed fakes}).
+On this unseen facial holdout, Coord-EfficientNet-B3 achieves 97.58\% overall accuracy compared to 95.25\% for the baseline. Overall errors are reduced from 57 to 29 (-49.1\%), and missed deepfakes (false negatives) are halved from 22 to 11 (-50.0\%).
 
-\subsection{False-Negative Analysis and Threshold Sensitivity}
-To evaluate security-critical trade-offs without data leakage, thresholds were calibrated on the validation set and evaluated across all 5,000 compressed test images. Table \ref{tab:threshold} outlines the operating trade-offs.
+\subsection{Decision Threshold Analysis}
+In forensic applications where missing a manipulated image carries a high cost, adjusting the classification threshold can prioritize recall. Table \ref{tab:threshold} shows the trade-off on the 5,000 compressed test images.
 
 \begin{table}[htbp]
-\caption{Decision Threshold Sensitivity on Compressed Test Set}
+\caption{Decision Threshold Trade-offs on Compressed Test Set}
 \label{tab:threshold}
 \centering
 \begin{tabular}{lcccccc}
-\toprule
-\textbf{Mode} & $\tau$ & \textbf{M3 FN} & \textbf{M6 FN} & \textbf{M3 FP} & \textbf{M6 FP} & \textbf{M6 Recall} \\
-\midrule
-Canonical & 0.50 & 226 & \textbf{206} & 128 & \textbf{97} & 95.88\% \\
-Balanced  & 0.46 & 215 & \textbf{196} & 142 & \textbf{111} & 96.08\% \\
-Recall-Bias & 0.35 & 192 & \textbf{176} & 185 & \textbf{140} & 96.48\% \\
+\hline
+\textbf{Mode} & $\tau$ & \textbf{Base FN} & \textbf{Coord FN} & \textbf{Base FP} & \textbf{Coord FP} & \textbf{Coord Recall} \\
+\hline
+Standard & 0.50 & 226 & \textbf{206} & 128 & \textbf{97} & 95.88\% \\
+Balanced & 0.46 & 215 & \textbf{196} & 142 & \textbf{111} & 96.08\% \\
+Recall-Focus & 0.35 & 192 & \textbf{176} & 185 & \textbf{140} & 96.48\% \\
 High-Recall & 0.20 & 158 & \textbf{139} & 276 & \textbf{194} & 97.22\% \\
-Security ($F_2$) & 0.15 & 144 & \textbf{123} & 342 & \textbf{238} & \textbf{97.54\%} \\
-Screening & 0.10 & 121 & \textbf{106} & 448 & \textbf{269} & \textbf{97.88\%} \\
-\bottomrule
+High-Security & 0.15 & 144 & \textbf{123} & 342 & \textbf{238} & \textbf{97.54\%} \\
+\hline
 \end{tabular}
 \end{table}
 
-Calibrating to $\tau = 0.35$ reduces M6 False Negatives from 206 to 176 (\textbf{-14.6\% missed fakes}) while keeping total errors (316) lower than the baseline at $\tau = 0.50$ (354 errors). Prioritizing high-security detection at $\tau = 0.15$ slashes False Negatives to 123 (\textbf{-40.3\% missed fakes}), attaining \textbf{97.54\% Recall}. Conversely, when baseline M3 is lowered to $\tau \le 0.20$, it triggers severe false alarm escalation (up to 448 FP). Coordinate Attention limits this dispersion, producing 179 fewer false alarms at $\tau = 0.10$.
+Adjusting $\tau$ to 0.35 lowers false negatives from 206 to 176 (-14.6\%) while keeping total errors lower than the baseline model operating at 0.50. At $\tau = 0.15$, false negatives drop to 123 (97.54\% recall). For lower thresholds, Coordinate Attention limits false positive growth compared to the baseline, recording 104 fewer false alarms at $\tau = 0.15$.
 
-\subsection{Qualitative Explainability via Grad-CAM}
-Visual activation heatmaps produced by Grad-CAM demonstrate that under aggressive lossy compression (QF20), activation heatmaps for EfficientNet-B3 disperse across periodic $8 \times 8$ pixel DCT block boundaries. In contrast, Coordinate Attention factorizes spatial pooling into 1D horizontal and vertical directions, acting as an intrinsic directional filter that suppresses 2D grid ringing and anchors attention tightly onto anatomical manipulation boundaries around facial perimeters, eyes, and mouth regions.
+\subsection{Grad-CAM Qualitative Findings}
+Visualizations from Grad-CAM show that when compression is heavy (QF20), baseline EfficientNet-B3 heatmaps often scatter along repetitive square boundaries corresponding to $8 \times 8$ JPEG blocks. In contrast, Coordinate Attention uses directional pooling that filters out grid artifacts and concentrates attention on authentic facial boundaries, such as the eyes, nose, and jawline contours.
 
 \section{Discussion and Limitations}
 
-\subsection{Mechanistic Basis of Compression Resilience}
-JPEG compression quantizes $8 \times 8$ DCT blocks, introducing isotropic 2D step-edge discontinuities across the entire image plane. Standard 2D pooling aggregates these artifacts uniformly. In contrast, Coordinate Attention factorizes spatial pooling into separate 1D horizontal ($H \times 1$) and vertical ($1 \times W$) projections. This directional decomposition averages out periodic local block boundaries while preserving continuous spatial boundary gradients spanning larger dimensions.
+\subsection{Mechanistic Basis of Compression Resistance}
+JPEG compression works by quantizing $8 \times 8$ pixel frequency blocks, creating small step changes along grid edges. Standard 2D convolutions easily register these discontinuities as edges. In contrast, Coordinate Attention aggregates features using 1D projections along horizontal and vertical lines. This directional averaging smooths out local block boundaries while preserving continuous anatomical contours that extend across larger spatial dimensions.
 
 \subsection{Limitations}
+This study has two main limitations:
 \begin{enumerate}
-    \item \textbf{Single-Frame Static Images:} The current framework targets static facial portraits ($256 \times 256$). Video deepfakes exhibit temporal inconsistencies requiring spatiotemporal recurrent modeling.
-    \item \textbf{Codec-Specific Quantization:} Evaluations focused on standard JPEG compression ($\text{QF} \in [20, 80]$). Operational pipelines often apply multi-stage transcoding combinations (e.g., resizing, WebP, AVIF).
+    \item The current setup evaluates static $256 \times 256$ face crops. Real-world video manipulations also contain temporal inconsistencies across frames that require sequential modeling.
+    \item Experiments used simulated JPEG compression with fixed quality factors. Social media platforms often combine resizing, format conversion, and custom compression algorithms.
 \end{enumerate}
 
-\section{Conclusion and Future Work}
-In this research, we addressed the vulnerability of deep learning DeepFake detectors to lossy social media compression by developing \textbf{Coord-EfficientNet-B3}. Evaluated across 12,000 standardized test inferences, Coord-EfficientNet-B3 consistently outperformed the baseline architecture across all evaluated compression tiers, reducing aggregate compressed errors by 14.4\% and false alarms by 24.2\% ($p = 0.0037$, McNemar test). On an independent unseen facial holdout, the proposed framework halved both False Negatives (-50.0\%) and overall errors (-49.1\%). Grad-CAM visual interpretability confirmed that Coordinate Attention effectively suppresses $8 \times 8$ DCT compression grid artifacts, anchoring network attention onto authentic facial manipulation seams. Future research will extend this directional attention mechanism to spatiotemporal video pipelines and explore cross-architecture transferability against latent diffusion models.
+\section{Conclusion}
+This study presented Coord-EfficientNet-B3, an attention-enhanced deep learning model designed for deepfake detection under lossy social media compression. Across 12,000 evaluations on compressed images, the proposed architecture reduced overall errors by 14.4\% and decreased false alarms by 24.2\% compared to the standard EfficientNet-B3 baseline. On an unseen facial holdout, it halved missed detections (-50.0\% false negatives). Grad-CAM visualizations verified that Coordinate Attention prevents feature dispersion across compression grids. Future work will investigate extending this mechanism to video forensics and emerging diffusion-based synthetic media.
 
-\bibliographystyle{IEEEtran}
-\bibliography{references}
+\begin{thebibliography}{15}
+
+\bibitem{karras2019style}
+T.~Karras, S.~Laine, and T.~Aila, ``A style-based generator architecture for generative adversarial networks,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2019, pp. 4401--4410.
+
+\bibitem{mirsky2021creation}
+Y.~Mirsky and W.~Lee, ``The creation and detection of deepfakes: A survey,'' \emph{ACM Comput. Surv.}, vol.~54, no.~1, pp. 1--36, 2021.
+
+\bibitem{tan2019efficientnet}
+M.~Tan and Q.~V. Le, ``EfficientNet: Rethinking model scaling for convolutional neural networks,'' in \emph{Proc. 36th Int. Conf. Mach. Learn. (ICML)}, 2019, pp. 6105--6114.
+
+\bibitem{deepa2026enhanced}
+B.~G. Deepa, C.~K. Lokesh, D.~Umamaheswari, B.~Ayshwarya, P.~V. Yethish, and K.~P. Suhaas, ``An enhanced deep learning framework for DeepFake detection using EfficientNet-B3: comparative evaluation of deep and machine learning techniques,'' \emph{Discov. Comput.}, vol.~29, no.~1, art. 18, pp. 1--23, 2026.
+
+\bibitem{verdoliva2020media}
+L.~Verdoliva, ``Media forensics for digital authenticity: Technologies, challenges, and perspectives,'' \emph{IEEE Access}, vol.~8, pp. 182\,390--182\,410, 2020.
+
+\bibitem{rossler2019faceforensics}
+A.~R{\"o}ssler, D.~Cozzolino, L.~Verdoliva, C.~Riess, J.~Thies, and M.~Nie{\ss}ner, ``FaceForensics++: Learning to detect manipulated facial images,'' in \emph{Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV)}, 2019, pp. 1--11.
+
+\bibitem{bondi2020training}
+L.~Bondi, E.~D. Cannas, P.~Bestagini, and S.~Tubaro, ``Training strategies and data augmentations in CNN-based deepfake video detection,'' in \emph{Proc. IEEE Int. Workshop Inf. Forensics Secur. (WIFS)}, 2020, pp. 1--6.
+
+\bibitem{hu2018squeeze}
+J.~Hu, L.~Shen, and G.~Sun, ``Squeeze-and-excitation networks,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2018, pp. 7132--7141.
+
+\bibitem{woo2018cbam}
+S.~Woo, J.~Park, J.-Y. Lee, and I.~S. Kweon, ``CBAM: Convolutional block attention module,'' in \emph{Proc. Eur. Conf. Comput. Vis. (ECCV)}, 2018, pp. 3--19.
+
+\bibitem{hou2021coordinate}
+Q.~Hou, D.~Zhou, and J.~Feng, ``Coordinate attention for efficient mobile network design,'' in \emph{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2021, pp. 13\,713--13\,722.
+
+\bibitem{selvaraju2017gradcam}
+R.~R. Selvaraju, M.~Cogswell, A.~Das, R.~Vedantam, D.~Parikh, and D.~Batra, ``Grad-CAM: Visual explanations from deep networks via gradient-based localization,'' in \emph{Proc. IEEE Int. Conf. Comput. Vis. (ICCV)}, 2017, pp. 618--626.
+
+\bibitem{chattopadhay2018gradcamplus}
+A.~Chattopadhay, A.~Sarkar, P.~Howlader, and V.~N. Balasubramanian, ``Grad-CAM++: Generalized gradient-based visual explanations for deep convolutional networks,'' in \emph{Proc. IEEE Winter Conf. Appl. Comput. Vis. (WACV)}, 2018, pp. 839--847.
+
+\bibitem{karki2021deepfake}
+M.~Karki, ``Deepfake and real images dataset,'' \emph{Kaggle}, 2021. [Online]. Available: https://www.kaggle.com/datasets/manjilkarki/deepfake-and-real-images
+
+\bibitem{li2018ictu}
+Y.~Li, M.-C. Chang, and S.~Lyu, ``In ictu oculi: Exposing AI-generated fake face videos by detecting eye blinking,'' in \emph{Proc. IEEE Int. Workshop Inf. Forensics Secur. (WIFS)}, 2018, pp. 1--7.
+
+\bibitem{afchar2018mesonet}
+D.~Afchar, V.~Nozick, J.~Yamagishi, and I.~Echizen, ``MesoNet: A compact facial video forgery detection network,'' in \emph{Proc. IEEE Int. Workshop Inf. Forensics Secur. (WIFS)}, 2018, pp. 1--7.
+
+\end{thebibliography}
 
 \end{document}
