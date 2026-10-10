@@ -1,0 +1,156 @@
+{
+  "original_dataset": [
+    {
+      "condition": "Clean",
+      "m3_acc": "97.40%",
+      "m6_acc": "97.80%",
+      "m3_prec": "98.57%",
+      "m6_prec": "98.78%",
+      "m3_rec": "96.20%",
+      "m6_rec": "96.80%",
+      "m3_fp": 14,
+      "m6_fp": 12,
+      "m3_fn": 38,
+      "m6_fn": 32,
+      "m3_errors": 52,
+      "m6_errors": 44
+    },
+    {
+      "condition": "QF80",
+      "m3_acc": "97.20%",
+      "m6_acc": "97.65%",
+      "m3_prec": "98.36%",
+      "m6_prec": "98.97%",
+      "m3_rec": "96.00%",
+      "m6_rec": "96.30%",
+      "m3_fp": 16,
+      "m6_fp": 10,
+      "m3_fn": 40,
+      "m6_fn": 37,
+      "m3_errors": 56,
+      "m6_errors": 47
+    },
+    {
+      "condition": "QF60",
+      "m3_acc": "97.40%",
+      "m6_acc": "97.65%",
+      "m3_prec": "97.98%",
+      "m6_prec": "98.67%",
+      "m3_rec": "96.80%",
+      "m6_rec": "96.60%",
+      "m3_fp": 20,
+      "m6_fp": 13,
+      "m3_fn": 32,
+      "m6_fn": 34,
+      "m3_errors": 52,
+      "m6_errors": 47
+    },
+    {
+      "condition": "QF50",
+      "m3_acc": "96.65%",
+      "m6_acc": "97.15%",
+      "m3_prec": "96.42%",
+      "m6_prec": "97.48%",
+      "m3_rec": "96.90%",
+      "m6_rec": "96.80%",
+      "m3_fp": 36,
+      "m6_fp": 25,
+      "m3_fn": 31,
+      "m6_fn": 32,
+      "m3_errors": 67,
+      "m6_errors": 57
+    },
+    {
+      "condition": "QF40",
+      "m3_acc": "96.25%",
+      "m6_acc": "96.65%",
+      "m3_prec": "98.13%",
+      "m6_prec": "98.34%",
+      "m3_rec": "94.30%",
+      "m6_rec": "94.90%",
+      "m3_fp": 18,
+      "m6_fp": 16,
+      "m3_fn": 57,
+      "m6_fn": 51,
+      "m3_errors": 75,
+      "m6_errors": 67
+    },
+    {
+      "condition": "QF20",
+      "m3_acc": "94.80%",
+      "m6_acc": "95.75%",
+      "m3_prec": "96.09%",
+      "m6_prec": "96.54%",
+      "m3_rec": "93.40%",
+      "m6_rec": "94.90%",
+      "m3_fp": 38,
+      "m6_fp": 34,
+      "m3_fn": 66,
+      "m6_fn": 51,
+      "m3_errors": 104,
+      "m6_errors": 85
+    }
+  ],
+  "external_dataset": [
+    {
+      "condition": "Clean",
+      "m3_correct": 15,
+      "m6_correct": 15,
+      "m3_acc": "75.0%",
+      "m6_acc": "75.0%",
+      "m6_before_acc": "70.0%",
+      "m6_gain_samples": 1,
+      "status": "TIED"
+    },
+    {
+      "condition": "QF80",
+      "m3_correct": 15,
+      "m6_correct": 15,
+      "m3_acc": "75.0%",
+      "m6_acc": "75.0%",
+      "m6_before_acc": "70.0%",
+      "m6_gain_samples": 1,
+      "status": "TIED"
+    },
+    {
+      "condition": "QF60",
+      "m3_correct": 15,
+      "m6_correct": 14,
+      "m3_acc": "75.0%",
+      "m6_acc": "70.0%",
+      "m6_before_acc": "65.0%",
+      "m6_gain_samples": 1,
+      "status": "M3 WINS (+1)"
+    },
+    {
+      "condition": "QF50",
+      "m3_correct": 15,
+      "m6_correct": 14,
+      "m3_acc": "75.0%",
+      "m6_acc": "70.0%",
+      "m6_before_acc": "65.0%",
+      "m6_gain_samples": 1,
+      "status": "M3 WINS (+1)"
+    },
+    {
+      "condition": "QF40",
+      "m3_correct": 15,
+      "m6_correct": 15,
+      "m3_acc": "75.0%",
+      "m6_acc": "75.0%",
+      "m6_before_acc": "75.0%",
+      "m6_gain_samples": 0,
+      "status": "TIED"
+    },
+    {
+      "condition": "QF20",
+      "m3_correct": 14,
+      "m6_correct": 14,
+      "m3_acc": "70.0%",
+      "m6_acc": "70.0%",
+      "m6_before_acc": "65.0%",
+      "m6_gain_samples": 1,
+      "status": "TIED"
+    }
+  ]
+}

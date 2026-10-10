@@ -1,0 +1,67 @@
+{
+  "condition_summary": [
+    {
+      "condition": "Clean",
+      "total_samples": 20,
+      "m3_accuracy": "70.0%",
+      "m6_accuracy": "70.0%",
+      "m3_fn": 4,
+      "m6_fn": 4,
+      "m3_fp": 2,
+      "m6_fp": 2
+    },
+    {
+      "condition": "QF80",
+      "total_samples": 20,
+      "m3_accuracy": "70.0%",
+      "m6_accuracy": "70.0%",
+      "m3_fn": 4,
+      "m6_fn": 4,
+      "m3_fp": 2,
+      "m6_fp": 2
+    },
+    {
+      "condition": "QF60",
+      "total_samples": 20,
+      "m3_accuracy": "70.0%",
+      "m6_accuracy": "65.0%",
+      "m3_fn": 4,
+      "m6_fn": 5,
+      "m3_fp": 2,
+      "m6_fp": 2
+    },
+    {
+      "condition": "QF50",
+      "total_samples": 20,
+      "m3_accuracy": "70.0%",
+      "m6_accuracy": "65.0%",
+      "m3_fn": 4,
+      "m6_fn": 5,
+      "m3_fp": 2,
+      "m6_fp": 2
+    },
+    {
+      "condition": "QF40",
+      "total_samples": 20,
+      "m3_accuracy": "70.0%",
+      "m6_accuracy": "75.0%",
+      "m3_fn": 4,
+      "m6_fn": 4,
+      "m3_fp": 2,
+      "m6_fp": 1
+    },
+    {
+      "condition": "QF20",
+      "total_samples": 20,
+      "m3_accuracy": "65.0%",
+      "m6_accuracy": "65.0%",
+      "m3_fn": 5,
+      "m6_fn": 5,
+      "m3_fp": 2,
+      "m6_fp": 2
+    }
+  ],
+  "total_samples_evaluated": 20,
+  "real_count": 10,
+  "fake_count": 10
+}
