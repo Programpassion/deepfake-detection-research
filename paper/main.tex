@@ -88,21 +88,14 @@ Attention mechanisms enable convolutional networks to emphasize salient feature 
 
 While effective in general vision tasks, standard attention formulations present distinct drawbacks in compressed forensic scenarios. SE pooling removes spatial coordinate information completely \cite{hou2021coordinate}. Standard two dimensional spatial attention captures broad spatial regions without directional selectivity, making it susceptible to locking onto repetitive two dimensional JPEG grid edges. Hou et al. \cite{hou2021coordinate} overcame these challenges with Coordinate Attention, which factorizes spatial pooling into orthogonal horizontal and vertical one dimensional feature vectors. This design captures position sensitive forensic signatures with negligible computational overhead, providing directional resilience against compression artifacts.
 
+\section{Proposed Methodology}
+
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/architecture_block_diagram.png}
 \caption{Detailed architectural block diagram of the proposed Coord-EfficientNet-B3 framework, showing the EfficientNet-B3 feature extractor, the Coordinate Attention module with orthogonal 1D pooling, and the multi-stage classifier head.}
 \label{fig:arch}
 \end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/experimental_workflow.png}
-\caption{End-to-end experimental workflow diagram detailing dataset curation, stochastic compression-aware training, multi-condition evaluation across 12,000 inferences, unseen holdout testing, and statistical validation.}
-\label{fig:workflow}
-\end{figure}
-
-\section{Proposed Methodology}
 
 The overall pipeline of the proposed \textbf{Coord-EfficientNet-B3} architecture is illustrated in Fig. \ref{fig:arch}. The framework comprises three core stages: (1) deep feature extraction via an EfficientNet-B3 backbone \cite{tan2019efficientnet}, (2) directional feature refinement through Coordinate Attention \cite{hou2021coordinate}, and (3) a multi-stage classification head producing the posterior probability.
 
@@ -155,6 +148,13 @@ Optimization minimizes the Binary Cross-Entropy (BCE) objective:
 Training uses the Adam optimizer with learning rate $\eta = 10^{-4}$ and mini-batch size $B = 16$ across 10 epochs. A two-stage transfer learning schedule is employed: the first two epochs freeze the backbone to stabilize the classifier head, followed by eight epochs of end-to-end fine-tuning.
 
 \section{Experimental Setup and Dataset}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/experimental_workflow.png}
+\caption{Flowchart of the complete experimental and evaluation methodology, illustrating dataset partition, stochastic compression-aware training, multi-regime testing, threshold optimization, and statistical validation aligning with Table I, Table II, and Table III.}
+\label{fig:workflow}
+\end{figure}
 
 The end-to-end experimental workflow is summarized in Fig. \ref{fig:workflow}.
 
@@ -283,7 +283,14 @@ Fig. \ref{fig:error_breakdown} illustrates the distribution of false positives a
 To establish statistical significance, a paired McNemar test was conducted over the 10,000 paired compressed predictions. The contingency table indicates 9,540 concordant correct classifications, 246 concordant incorrect classifications, 157 instances where Coord-EfficientNet-B3 was correct while Baseline failed, and 57 instances where Baseline was correct while Coord-EfficientNet-B3 failed. The resulting test statistic is $\chi^2 = 10.55$, corresponding to a two-tailed $p$-value of $p = 0.00116$. Because $p < 0.01$, the performance superiority of the proposed framework over the standard EfficientNet-B3 baseline is statistically significant.
 
 \subsection{Generalization on Unseen Pure Facial Holdout}
-To evaluate model robustness on unseen subjects, an additional holdout benchmark of 200 face portraits was evaluated across all six compression conditions, yielding 1,200 inference runs. The results are presented in Table \ref{tab:holdout}.
+To evaluate model robustness on unseen subjects, an additional holdout benchmark of 200 face portraits was evaluated across all six compression conditions, yielding 1,200 inference runs. The results are presented in Table \ref{tab:holdout}, and representative sample facial portraits evaluated under this protocol are illustrated in Fig. \ref{fig:samples}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/sample_faces.png}
+\caption{Representative sample facial portraits from the benchmark dataset evaluated under compression: authentic human faces from FFHQ (top) and synthetic faces from StyleGAN (bottom).}
+\label{fig:samples}
+\end{figure}
 
 The proposed Coord-EfficientNet-B3 architecture attains 97.58\% aggregate accuracy across the holdout benchmark, compared to 95.25\% for the baseline. Total errors drop from 57 to 29, corresponding to an overall error reduction of 49.1\%. Notably, missed synthetic faces (false negatives) are halved from 22 to 11 (-50.0\%), while false alarms drop from 35 to 18 (-48.6\%). This demonstrates that the directional coordinate pooling mechanism generalizes effectively to unseen facial anatomies without overfitting to training identities.
 
