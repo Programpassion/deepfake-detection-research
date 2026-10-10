@@ -218,32 +218,37 @@ Across the 10,000 compressed evaluations (QF80--QF20):
 \subsection{Unseen Pure Facial Holdout Benchmark (1,200 Inferences)}
 To test generalization on unseen subjects, 200 facial crops were drawn from the untouched `Test/` directory of the benchmark repository \cite{karki2021deepfake}. Table \ref{tab:holdout} presents the results across all six conditions at $\tau = 0.50$.
 
-\begin{table}[htbp]
-\caption{Evaluation on Unseen Pure Facial Holdout Dataset ($\tau = 0.50$)}
+\begin{table*}[t]
+\caption{Evaluation on Unseen Pure Facial Holdout Dataset Across Multi-QF Regimes ($\tau = 0.50$)}
 \label{tab:holdout}
 \centering
-\begin{tabular}{lcccccc}
+\begin{tabular}{llcccccccc}
 \toprule
-\textbf{Condition} & \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{FP} & \textbf{FN} & \textbf{Errors} \\
+\textbf{Condition} & \textbf{Model} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} & \textbf{F1 Score} & \textbf{FP} & \textbf{FN} & \textbf{Total Errors} & \textbf{Error Reduction} \\
 \midrule
-Clean & M3 Base & 96.00\% & 97.00\% & 5 & 3 & 8 \\
-      & \textbf{M6 Coord} & \textbf{97.50\%} & \textbf{98.00\%} & \textbf{3} & \textbf{2} & \textbf{5} \\
-QF80  & M3 Base & 96.00\% & 97.00\% & 5 & 3 & 8 \\
-      & \textbf{M6 Coord} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{1} & \textbf{2} & \textbf{3} \\
-QF60  & M3 Base & 94.00\% & 94.00\% & 6 & 6 & 12 \\
-      & \textbf{M6 Coord} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{2} & \textbf{2} & \textbf{4} \\
-QF50  & M3 Base & 94.50\% & 98.00\% & 9 & 2 & 11 \\
-      & \textbf{M6 Coord} & \textbf{96.50\%} & \textbf{99.00\%} & \textbf{6} & \textbf{1} & \textbf{7} \\
-QF40  & M3 Base & 95.50\% & 96.00\% & 5 & 4 & 9 \\
-      & \textbf{M6 Coord} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{1} & \textbf{2} & \textbf{3} \\
-QF20  & M3 Base & 95.50\% & 96.00\% & 5 & 4 & 9 \\
-      & \textbf{M6 Coord} & \textbf{96.50\%} & \textbf{98.00\%} & \textbf{5} & \textbf{2} & \textbf{7} \\
+Clean & M3 Baseline & 96.00\% & 97.00\% & 95.10\% & 96.04\% & 5 & 3 & 8 & --- \\
+      & \textbf{M6 CoordAtt} & \textbf{97.50\%} & \textbf{98.00\%} & \textbf{97.03\%} & \textbf{97.51\%} & \textbf{3} & \textbf{2} & \textbf{5} & \textbf{-37.5\%} \\
 \midrule
-\textbf{Aggregate} & M3 Base & 95.25\% & 96.33\% & 35 & 22 & 57 \\
-\textbf{(1,200)}   & \textbf{M6 Coord} & \textbf{97.58\%} & \textbf{98.17\%} & \textbf{18} & \textbf{11} & \textbf{29 (-49.1\%)} \\
+QF80  & M3 Baseline & 96.00\% & 97.00\% & 95.10\% & 96.04\% & 5 & 3 & 8 & --- \\
+      & \textbf{M6 CoordAtt} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{98.99\%} & \textbf{98.49\%} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{-62.5\%} \\
+\midrule
+QF60  & M3 Baseline & 94.00\% & 94.00\% & 94.00\% & 94.00\% & 6 & 6 & 12 & --- \\
+      & \textbf{M6 CoordAtt} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{98.00\%} & \textbf{2} & \textbf{2} & \textbf{4} & \textbf{-66.7\%} \\
+\midrule
+QF50  & M3 Baseline & 94.50\% & 98.00\% & 91.59\% & 94.69\% & 9 & 2 & 11 & --- \\
+      & \textbf{M6 CoordAtt} & \textbf{96.50\%} & \textbf{99.00\%} & \textbf{94.29\%} & \textbf{96.59\%} & \textbf{6} & \textbf{1} & \textbf{7} & \textbf{-36.4\%} \\
+\midrule
+QF40  & M3 Baseline & 95.50\% & 96.00\% & 95.05\% & 95.52\% & 5 & 4 & 9 & --- \\
+      & \textbf{M6 CoordAtt} & \textbf{98.50\%} & \textbf{98.00\%} & \textbf{98.99\%} & \textbf{98.49\%} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{-66.7\%} \\
+\midrule
+QF20  & M3 Baseline & 95.50\% & 96.00\% & 95.05\% & 95.52\% & 5 & 4 & 9 & --- \\
+      & \textbf{M6 CoordAtt} & \textbf{96.50\%} & \textbf{98.00\%} & \textbf{95.15\%} & \textbf{96.55\%} & \textbf{5} & \textbf{2} & \textbf{7} & \textbf{-22.2\%} \\
+\midrule
+\textbf{Aggregate} & M3 Baseline & 95.25\% & 96.33\% & 94.29\% & 95.30\% & 35 & 22 & 57 & --- \\
+\textbf{(1,200 runs)} & \textbf{M6 CoordAtt} & \textbf{97.58\%} & \textbf{98.17\%} & \textbf{97.03\%} & \textbf{97.60\%} & \textbf{18} & \textbf{11} & \textbf{29} & \textbf{-49.1\%} \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 On unseen facial portraits, M6 achieves \textbf{97.58\% overall accuracy} (vs. 95.25\% for M3), cutting total classification errors from 57 to 29 (\textbf{-49.1\% reduction}) and halving False Negatives from 22 to 11 (\textbf{-50.0\% reduction in missed fakes}).
 

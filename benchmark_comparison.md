@@ -38,7 +38,34 @@ Both architectures use identical training protocols ($B=16$, $\text{LR}=10^{-4}$
 
 ---
 
-## 3. Core Scientific Insights
+## 3. Unseen Pure Facial Holdout Benchmark (1,200 Inferences)
+
+To test generalization on unseen subjects, 200 facial crops were drawn from the untouched `Test/` directory of the benchmark repository (100 Real, 100 Fake, 0% overlap with training/validation splits). The table below details the results across all six conditions at canonical threshold $\tau = 0.50$.
+
+### Table II: Evaluation on Unseen Pure Facial Holdout Dataset
+*Evaluated on 200 unseen face portraits (100 Real, 100 Fake; threshold $\tau = 0.50$).*
+
+| Condition | Model | Accuracy | Recall | Precision | F1 Score | FP | FN | Total Errors | Error Reduction |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Clean** | M3 Baseline | 96.00% | 97.00% | 95.10% | 96.04% | 5 | 3 | 8 | — |
+| | **M6 CoordAtt** | **97.50%** | **98.00%** | **97.03%** | **97.51%** | **3** | **2** | **5** | **-37.5%** |
+| **QF80** | M3 Baseline | 96.00% | 97.00% | 95.10% | 96.04% | 5 | 3 | 8 | — |
+| | **M6 CoordAtt** | **98.50%** | **98.00%** | **98.99%** | **98.49%** | **1** | **2** | **3** | **-62.5%** |
+| **QF60** | M3 Baseline | 94.00% | 94.00% | 94.00% | 94.00% | 6 | 6 | 12 | — |
+| | **M6 CoordAtt** | **98.00%** | **98.00%** | **98.00%** | **98.00%** | **2** | **2** | **4** | **-66.7%** |
+| **QF50** | M3 Baseline | 94.50% | 98.00% | 91.59% | 94.69% | 9 | 2 | 11 | — |
+| | **M6 CoordAtt** | **96.50%** | **99.00%** | **94.29%** | **96.59%** | **6** | **1** | **7** | **-36.4%** |
+| **QF40** | M3 Baseline | 95.50% | 96.00% | 95.05% | 95.52% | 5 | 4 | 9 | — |
+| | **M6 CoordAtt** | **98.50%** | **98.00%** | **98.99%** | **98.49%** | **1** | **2** | **3** | **-66.7%** |
+| **QF20** | M3 Baseline | 95.50% | 96.00% | 95.05% | 95.52% | 5 | 4 | 9 | — |
+| | **M6 CoordAtt** | **96.50%** | **98.00%** | **95.15%** | **96.55%** | **5** | **2** | **7** | **-22.2%** |
+| **Aggregate**<br>*(1,200 runs)* | **M3 Baseline**<br>**M6 CoordAtt** | 95.25%<br>**97.58%** | 96.33%<br>**98.17%** | 94.29%<br>**97.03%** | 95.30%<br>**97.60%** | 35<br>**18** | 22<br>**11** | 57<br>**29** | **-49.1% Error Reduction**<br>**-50.0% FN Reduction** |
+
+*Key Takeaway:* On pure facial portraits, M6 outperforms M3 under every single compression condition, cutting False Negatives in half (**11 vs. 22 FN**) and reducing overall errors by **49.1%** (29 vs. 57 errors).
+
+---
+
+## 4. Core Scientific Insights
 
 ### 1. Robustness Under Severe Compression (QF20)
 At **JPEG Quality Factor 20** (mimicking harsh social media re-compression on platforms like WhatsApp and Facebook):
